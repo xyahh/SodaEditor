@@ -6,21 +6,23 @@
 
 USE_SODA;
 
-SodaLayer::SodaLayer()
+// Called when the Layer is Created
+bool SodaLayer::OnCreate()
 {
-}
-
-
-SodaLayer::~SodaLayer()
-{
+	return true;
 }
 
 // Draws the Layer on the Window Specified
-
-void SodaLayer::Draw(SodaWindow * Window) 
+void SodaLayer::Render(SodaGraphics * Graphics)
 {
-	Window->ClearScreen(ClearColor);
+	if (bIsVisible)
+		Graphics->DrawImage(&Bitmap, 0, 0);
+}
 
+void SodaLayer::Draw(int PixelX, int PixelY, const SodaColor& _Color)
+{
+	Bitmap.SetPixel(PixelX, PixelY, SodaColor::MakeARGB
+	(_Color.GetA(), _Color.GetR(), _Color.GetG(), _Color.GetB()));
 }
 
 void SodaLayer::OnFocusGained()
@@ -31,12 +33,13 @@ void SodaLayer::OnFocusLost()
 {
 }
 
-void SodaLayer::SetVisibility(bool Visibility)
+bool SodaLayer::GetVisibility() const
 {
-	bIsVisible = Visibility;
+	return bIsVisible;
 }
 
-void SodaLayer::SetClearColor(FVectorParam1 _ClearColor)
+bool SodaLayer::ToggleVisibility()
 {
-	ClearColor = StoreFloat4(_ClearColor);
+	bIsVisible = !bIsVisible;
+	return bIsVisible;
 }

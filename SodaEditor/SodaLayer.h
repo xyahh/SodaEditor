@@ -1,6 +1,7 @@
 // Copyright 2019, Juan Marcelo Portillo. All Rights Reserved.
 
 #pragma once
+#include "SodaGraphics.h"
 
 BEGIN_SODA
 
@@ -14,15 +15,25 @@ Soda Layer
 class SodaLayer
 {
 public:
-	SodaLayer();
-	~SodaLayer();
+
+	SodaLayer(int Width, int Height) 
+		: bIsVisible(true) , Bitmap(Width, Height, PixelFormat32bppARGB)
+	{
+	}
+
+	/* SodaImage (i.e. CImage) handles deallocation automatically, so nothing to be called in Dtor */
+	~SodaLayer()
+	{
+	}
 
 	// Called when the Layer is Created
-	void OnCreate() {}
+	bool OnCreate();
 
-	// Draws the Layer on the Window Specified
-	void Draw(SodaWindow* Window);
+	// Renders  the Layer on the Window Specified
+	void Render(SodaGraphics* Graphics);
 	
+	void Draw(int PixelX, int PixelY, const SodaColor& _Color);
+
 	//Called at Fixed Delta Times
 	void Update(float DeltaTime) {}
 
@@ -35,22 +46,25 @@ public:
 	//Called when another Layer is focused (another one set as active)
 	void OnFocusLost();
 
-	/* 
-	Sets the Visibility of the Layer. Whether to Draw it or not.
-	@ bool Visibility -> true to Show, false to Hide
-	*/
-	void SetVisibility(bool Visibility);
-
 	/*
-	Sets the Color which to use whn clearing the Layer Screen
-	@ Float4 _ClearColor -> the Clear Color in the format (R, G, B, A)
+	Returns the Current Visibility of the Layer.
+	@ True -> Visible.
+	@ False -> Hidden
 	*/
-	void SetClearColor(FVectorParam1 _ClearColor);
+	bool GetVisibility() const;
+
+	/* 
+	Toggles the Visibility of the Layer. Whether to Draw it or not.
+	@ RETURN: The new Visibility
+	@ True -> Visible.
+	@ False -> Hidden
+	*/
+	bool ToggleVisibility();
 
 private:
 
-	Float4	ClearColor;
-	bool	bIsVisible;
+	SodaBitmap	Bitmap;
+	bool		bIsVisible;
 
 };
 

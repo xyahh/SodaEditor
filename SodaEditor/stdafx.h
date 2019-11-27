@@ -3,6 +3,9 @@
 #pragma once
 
 #include <Windows.h>
+#include <objidl.h>
+#include <gdiplus.h>
+#pragma comment (lib,"Gdiplus.lib")
 
 #include <vector>
 

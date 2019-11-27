@@ -1,6 +1,7 @@
 // Copyright 2019, Juan Marcelo Portillo. All Rights Reserved.
 
 #pragma once
+#include "SodaGraphics.h"
 
 BEGIN_SODA
 
@@ -25,13 +26,21 @@ public:
 
 	void SwapBuffers();
 
+	/*
+	Calls the ShowWindow, and Focus Window and Update Window functionjs
+	*/
 	void StartWindow();
 
-	void ClearScreen(const Float4& Color)
-	{
-		SetDCBrushColor(hDC, RGB(Color.x, Color.y, Color.z, Color.w));
-		FillRect(hDC, &WindowRect, static_cast<HBRUSH>(GetStockObject(DC_BRUSH)));
-	}
+	/*
+	Generates a New Soda Graphics. 
+	@ Deallocation must take place after use! (delete Graphics!)
+	*/
+	SodaGraphics* MakeGraphics();
+
+	/*
+	Gets the current position of the Mouse Relative to the Window calling it
+	*/
+	void GetCursorPosition(int* outX, int* outY) const;
 
 protected:
 
@@ -42,16 +51,18 @@ protected:
 
 private:
 
-	RECT		WindowRect;
+	ULONG_PTR		SodaGraphicsToken = 0;
 
-	FString		WindowTitle;
-	Uint2		WindowSize;
+	RECT			WindowRect;
 
-	HINSTANCE	hInstance;
-	MSG			Msg;
-	HWND		hWnd;
+	FString			WindowTitle;
+	Uint2			WindowSize;
 
-	HDC			hDC;
+	HINSTANCE		hInstance;
+	MSG				Msg;
+	HWND			hWnd;
+
+	HDC				hDC;
 };
 
 END_SODA

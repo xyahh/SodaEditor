@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="SodaCanvas.cpp" />
+    <ClCompile Include="SodaGraphics.cpp" />
     <ClCompile Include="SodaLayer.cpp" />
     <ClCompile Include="SodaWindow.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -131,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="BasicDefines.h" />
     <ClInclude Include="SodaCanvas.h" />
+    <ClInclude Include="SodaGraphics.h" />
     <ClInclude Include="SodaLayer.h" />
     <ClInclude Include="SodaMath.h" />
     <ClInclude Include="SodaWindow.h" />
