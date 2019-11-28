@@ -13,13 +13,13 @@ bool SodaLayer::OnCreate()
 }
 
 // Draws the Layer on the Window Specified
-void SodaLayer::Render(SodaGraphics * Graphics)
+void SodaLayer::Render(SodaGraphics * Graphics, int X, int Y, int Width, int Height)
 {
 	if (bIsVisible)
-		Graphics->DrawImage(&Bitmap, 0, 0);
+		Graphics->DrawImage(&Bitmap, X, Y, Width, Height);
 }
 
-void SodaLayer::Draw(int PixelX, int PixelY, const SodaColor& _Color)
+void SodaLayer::SetPixelColor(int PixelX, int PixelY, const SodaColor& _Color)
 {
 	Bitmap.SetPixel(PixelX, PixelY, SodaColor::MakeARGB
 	(_Color.GetA(), _Color.GetR(), _Color.GetG(), _Color.GetB()));

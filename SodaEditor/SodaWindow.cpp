@@ -11,7 +11,7 @@
 
 USE_SODA;
 
-SodaWindow::SodaWindow(const FString & _WindowTitle, int Width, int Height)
+SodaWindow::SodaWindow(const FString & _WindowTitle, int CenterOffsetX, int CenterOffsetY, int Width, int Height)
 {
 	//Allocate a Console and Streams for Debugging
 #ifdef SODA_DEBUG
@@ -39,17 +39,12 @@ SodaWindow::SodaWindow(const FString & _WindowTitle, int Width, int Height)
 	EnableMenuItem(GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE, MF_GRAYED);
 #endif
 
-	//Init GDI+
-	Gdiplus::GdiplusStartupInput StartupInput;
-	Gdiplus::GdiplusStartup(&SodaGraphicsToken, &StartupInput, NULL);
-
-
 	//Standard Window Initialization
 	WindowTitle = _WindowTitle;
-	WindowSize.x = Width;
-	WindowSize.y = Height;
+	WindowSizeX = Width;
+	WindowSizeY = Height;
 
-	RECT WindowRect{ 0, 0, (LONG)WindowSize.x, (LONG)WindowSize.y };
+	RECT WindowRect{ 0, 0, WindowSizeX, WindowSizeY };
 
 	LPCTSTR lpszClass = *WindowTitle;
 	hInstance = GetModuleHandle(NULL);
@@ -74,7 +69,8 @@ SodaWindow::SodaWindow(const FString & _WindowTitle, int Width, int Height)
 	RECT ScreenSize;
 	GetWindowRect(GetDesktopWindow(), &ScreenSize);
 
-	POINT Center
+	/* Spawn the Window at the Desktop's Center */
+	POINT WindowDefPos
 	{
 		(ScreenSize.right - WindowRect.right) / 2 ,
 		(ScreenSize.bottom - WindowRect.bottom) / 2
@@ -83,27 +79,28 @@ SodaWindow::SodaWindow(const FString & _WindowTitle, int Width, int Height)
 	hWnd = CreateWindowEx(
 		dwExStyle, lpszClass, *WindowTitle,
 		dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		Center.x, Center.y,
+		WindowDefPos.x + CenterOffsetX, //Adding Offset to Support Multiple Windows being opened in different Positions
+		WindowDefPos.y + CenterOffsetY,
 		WindowRect.right - WindowRect.left,
 		WindowRect.bottom - WindowRect.top,
 		NULL, NULL, hInstance, NULL);
 
-	hDC = GetDC(hWnd);
+	//Create Back Buffer on Window Init
+	CreateBackBuffer();
+
 	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)this);
 	
 }
 
 SodaWindow::~SodaWindow()
 {
-	ReleaseDC(hWnd, hDC);
+	ReleaseBackBuffer();
+
 	DestroyWindow(hWnd);
 	UnregisterClass(*WindowTitle, hInstance);
-	hDC = NULL;
+	hdcBackBuffer = NULL;
 	hWnd = NULL;
 	hInstance = NULL;
-
-	if (SodaGraphicsToken)
-		Gdiplus::GdiplusShutdown(SodaGraphicsToken);
 }
 
 LRESULT SodaWindow::GlobalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -128,8 +125,50 @@ bool SodaWindow::ProcessMessage()
 	return true;
 }
 
+void SodaWindow::GetWindowSize(LONG * X, LONG * Y)
+{
+	*X = WindowSizeX;
+	*Y = WindowSizeY;
+}
+
+void SodaWindow::CreateBackBuffer()
+{
+	ReleaseBackBuffer();
+	hdcBackBuffer = CreateCompatibleDC(nullptr);
+
+	HDC hdc = GetDC(hWnd);
+
+	hbmpBackBuffer = CreateCompatibleBitmap(hdc,
+		WindowSizeX,
+		WindowSizeY);
+
+	SelectObject(hdcBackBuffer, hbmpBackBuffer);
+
+	ReleaseDC(hWnd, hdc);
+}
+
 void SodaWindow::SwapBuffers()
 {
+	HDC hdc = GetDC(hWnd);
+	RECT ClientRect;
+	GetClientRect(hWnd, &ClientRect);
+
+	BitBlt(hdc,
+		ClientRect.left, //x
+		ClientRect.top,  //y
+		(ClientRect.right - ClientRect.left), //width
+		(ClientRect.bottom - ClientRect.top), //height
+		hdcBackBuffer, 
+		ClientRect.left, 
+		ClientRect.top,
+		SRCCOPY);
+	ReleaseDC(hWnd, hdc);
+}
+
+void SodaWindow::ReleaseBackBuffer()
+{
+	SafeRelease(hbmpBackBuffer);
+	SafeRelease(hdcBackBuffer);
 }
 
 void SodaWindow::StartWindow()
@@ -142,7 +181,7 @@ void SodaWindow::StartWindow()
 
 SodaGraphics * SodaWindow::MakeGraphics()
 {
-	return SodaGraphics::FromHWND(hWnd);
+	return SodaGraphics::FromHDC(hdcBackBuffer);
 }
 
 void SodaWindow::GetCursorPosition(int * outX, int * outY) const
@@ -156,6 +195,12 @@ void SodaWindow::GetCursorPosition(int * outX, int * outY) const
 
 }
 
+void SodaWindow::UnbindAllDelegates()
+{
+	OnMouseProc.UnbindAll();
+	OnWindowResized.UnbindAll();
+}
+
 LRESULT SodaWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -165,13 +210,30 @@ LRESULT SodaWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		return FALSE;
 	}
-	case WM_MOUSEMOVE:
+
+	/* Update Window Size Vars everytime it is Resized */
+	case WM_SIZE:
 	{
+		WindowSizeX = LOWORD(lParam);
+		WindowSizeY = HIWORD(lParam);
+
+		//Resize the Buffers on Release
+		ReleaseBackBuffer();
+		CreateBackBuffer();
+
+		OnWindowResized.Call(WindowSizeX, WindowSizeY);
 		return FALSE;
 	}
-	case WM_LBUTTONDOWN:
-	{
 
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	{
+		int xPos = GET_X_LPARAM(lParam);
+		int yPos = GET_Y_LPARAM(lParam);
+		OnMouseProc.Call(xPos, yPos, wParam, (uMsg == WM_LBUTTONDOWN) || (uMsg == WM_RBUTTONDOWN) || (uMsg == WM_MOUSEMOVE));
 		return FALSE;
 	}
 	case  WM_ERASEBKGND:

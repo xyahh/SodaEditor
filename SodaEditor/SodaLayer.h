@@ -16,7 +16,7 @@ class SodaLayer
 {
 public:
 
-	SodaLayer(int Width, int Height) 
+	SodaLayer(LONG Width, LONG Height)
 		: bIsVisible(true) , Bitmap(Width, Height, PixelFormat32bppARGB)
 	{
 	}
@@ -30,9 +30,9 @@ public:
 	bool OnCreate();
 
 	// Renders  the Layer on the Window Specified
-	void Render(SodaGraphics* Graphics);
+	void Render(SodaGraphics* Graphics, int X, int Y, int Width, int Height);
 	
-	void Draw(int PixelX, int PixelY, const SodaColor& _Color);
+	void SetPixelColor(int PixelX, int PixelY, const SodaColor& _Color);
 
 	//Called at Fixed Delta Times
 	void Update(float DeltaTime) {}
