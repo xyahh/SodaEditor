@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="SodaCanvas.cpp" />
     <ClCompile Include="Delegate.cpp" />
+    <ClCompile Include="SodaCore.cpp" />
     <ClCompile Include="SodaGraphics.cpp" />
     <ClCompile Include="SodaLayer.cpp" />
     <ClCompile Include="SodaPalette.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="BasicDefines.h" />
     <ClInclude Include="SodaCanvas.h" />
     <ClInclude Include="Delegate.h" />
+    <ClInclude Include="SodaCore.h" />
     <ClInclude Include="SodaFunctionLibrary.h" />
     <ClInclude Include="SodaGraphics.h" />
     <ClInclude Include="SodaLayer.h" />

@@ -2,8 +2,11 @@
 
 #include "stdafx.h"
 
+#include "SodaCore.h"
+
 #include "SodaWindow.h"
 #include "SodaCanvas.h"
+
 #include "SodaPalette.h"
 
 /*
@@ -13,15 +16,16 @@ that we do not need a "Super" class that controls the Tick
 
 int main()
 {
-	//Graphic Initialization
-	SODA SodaGraphicsStartup Startup;
+
+	//Graphic & Other Stuff Initialization
+	SODA SodaCore Startup;
 
 	//Initializing Soda Windows
 	STD vector<SODA SodaWindow*> Windows 
 	{
-		new SODA SodaWindow{ TEXT("Soda Editor")	, 0, 0, 640, 640}, // Index 0 : The Main Window
-		new SODA SodaWindow{ TEXT("Palette")		, -320 - 100, -320 + 100, 200, 200}, // Index 1 : Color Selection Window
-		new SODA SodaWindow{ TEXT("Preview")		,  320 + 150, -320 + 150, 300, 300}  // Index 2 : Preview Window
+		new SODA SodaWindow	{ TEXT("Soda Editor")	, 0, 0, 640, 640					}, // Index 0 : The Main Window
+		new SODA SodaWindow	{ TEXT("Palette")		, -320 - 100, -320 + 100, 200, 200	}, // Index 1 : Color Selection Window
+		new SODA SodaWindow	{ TEXT("Preview")		,  320 + 150, -320 + 150, 300, 300	}  // Index 2 : Preview Window
 	};
 
 	SODA SodaPalette Palette;

@@ -42,6 +42,9 @@
     <ClCompile Include="Delegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SodaCore.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SodaWindow.h">
@@ -73,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="BasicDefines.h">
       <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="SodaCore.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

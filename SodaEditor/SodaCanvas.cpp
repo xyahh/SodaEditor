@@ -115,6 +115,7 @@ void SodaCanvas::Reset(size_t StartingLayerCount)
 
 void SodaCanvas::SetActiveLayer(size_t Index)
 {
+	//Make sure we have at least one layer. 
 	if (Layers.empty()) return;
 
 	size_t Zero = 0;
@@ -131,8 +132,12 @@ void SodaCanvas::SetActiveLayer(size_t Index)
 void SodaCanvas::SetWindow(SodaWindow * Window)
 {
 	Window->UnbindAllDelegates();
-	CanvasWindow = Window;
 
+	//if we had a previous Window bound, unbind all delegates from that window
+	//(process here if we want to close that previous Window)
+	if (CanvasWindow) CanvasWindow->UnbindAllDelegates();
+
+	CanvasWindow = Window;
 	CanvasWindow->OnMouseProc.Bind([&](int MouseX, int MouseY, int Key, bool IsPressed)
 	{
 		ProcessMouseEvent(MouseX, MouseY, Key, IsPressed);
@@ -150,6 +155,7 @@ void SodaCanvas::SetWindow(SodaWindow * Window)
 void SodaCanvas::SetPalette(SodaPalette * Palette)
 {
 	Palette->OnColorSelected.UnbindAll();
+	if (CanvasPalette) CanvasPalette->OnColorSelected.UnbindAll();
 	CanvasPalette = Palette;
 	CanvasPalette->OnColorSelected.Bind([&](const SodaColor& Color)
 	{

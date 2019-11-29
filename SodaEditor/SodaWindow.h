@@ -74,11 +74,13 @@ public:
 protected:
 
 	/*
-	@ Local WndProc called by GlobalWndProc.
+	@ BaseWndProc called by GlobalWndProc for a Specific Window
+	@ BaseWndProc handles Functionality needed by all Windows (e.g. Handle resizing for double buffering, mouse click delegate call, etc)
+	@ If nothing was processed, BaseWndProc calls ChildWndProc to process Functionality otherwise not found in BaseWndProc
 	*/
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-private:
+protected:
 
 	RECT			WindowRect;
 

@@ -3,3 +3,4 @@
 #include "stdafx.h"
 #include "SodaGraphics.h"
 
+USE_SODA;
