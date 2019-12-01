@@ -114,10 +114,10 @@ void SodaProperties::resized()
     //[/UserPreResize]
 
     brushGroup->setBounds (0, 0, proportionOfWidth (1.0000f), 250);
-    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
+    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
     layerGroup->setBounds (0, 250, proportionOfWidth (1.0000f), 250);
-    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
-    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 20, 150, 50);
+    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
+    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 20, 150, 50);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }

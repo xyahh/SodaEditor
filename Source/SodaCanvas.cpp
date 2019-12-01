@@ -246,7 +246,7 @@ void SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)
 bool SodaCanvas::undo()
 {
 	//don't process if stack empty or currently drawing
-	if (undoStack.empty() || drawCommand) 
+	if (undoStack.empty() || drawCommand)
 		return false;
 
 	//check out top and pop right after

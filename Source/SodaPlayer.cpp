@@ -80,7 +80,7 @@ void SodaPlayer::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    imageButton->setBounds ((getWidth() / 2) - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.7997f) / 2), 80, proportionOfHeight (0.7997f));
+    imageButton->setBounds ((getWidth() / 2) - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.8000f) / 2), 80, proportionOfHeight (0.8000f));
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
