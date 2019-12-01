@@ -21,7 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
-
+#include "SodaGlobals.h"
 class FSodaDrawCommand;
 
 //[/Headers]
@@ -49,11 +49,19 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 
 	// updates 60hz
-	void update(FSodaDrawCommand* drawCommand);
+	void update();
 
 	// updates the mouse position whenever a mouse event is called in the Canvas
-	void draw(const MouseEvent& e, FSodaDrawCommand* drawCommand);
-	void drawAt(int X, int Y, int brushSize, const Colour& colour, FSodaDrawCommand* drawCommand);
+	void startDraw(const MouseEvent& e);
+	void draw(const MouseEvent& e);
+
+	// takes the data from the OldPixels, reverts them, and clears both newPixels & OldPixels
+	void resetDrawings();
+
+	//drawing ends, isDrawing is set to false, and we move the pixel data to the caller.
+	void endDraw(const MouseEvent& e, std::set<FPixel>* outNewPixels, std::set<FPixel>* outOldPixels);
+
+	void drawPixel(int X, int Y, int brushSize, const Colour& colour);
 	// Converts a Position from the Component space to the Image pixel space
 	Point<int> ConvertPosition(const Point<int>& Pos);
 	Image* getLayerImage();
@@ -78,11 +86,22 @@ private:
 	*/
 	Point<int>		PreviousMouseCoords;
 	Point<int>		CurrentMouseCoords;
+	//Used for Shapes like Rect and Circle
+	Point<int>		PivotMouseCoords;
+
+	
+	//used to record all the pixels that are captured while drawing
+	// this method allows us to do what we please with this 
+	// so we can make different shapes 
+	std::set<FPixel> NewPixels;
+	std::set<FPixel> OldPixels;
 
 	int				layer_width;
 	int				layer_height;
 	int				layer_pixelSize;
 
+	//acts like a 'lock' for when we can acces the SET of new pixels/old pixels
+	bool			isDrawing;
     //[/UserVariables]
 
     //==============================================================================

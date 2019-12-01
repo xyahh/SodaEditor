@@ -12,6 +12,23 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <set>
 
+/*
+Enum class that tells us 
+what type of Shape we are currently drawing/selected
+
+@ FreeStyle: Free drawing, no algorithms used. Just color the pixels that the mouse passes through
+@ Circle: Circle that increases in radius as the Mouse moves away from the origin point
+@ Rectangle: Rect that increases in size as the mouse moves away from the origin point
+
+*/
+enum class ESodaShapes
+{
+	FreeStyle,
+	Circle,
+	Rectangle
+};
+
+
 /* Soda Properties
 @ Used to keep control of properties like
 BRUSH settings (Colour, size, etc)
@@ -24,12 +41,14 @@ struct FSodaProperties
 		, brushSize(1) 
 		, currentImage(nullptr)
 		, isGridVisible(true)
+		, currentBrush(ESodaShapes::FreeStyle)
 	{}
 	
 	Colour brushColour;
 	int brushSize;
 	Image* currentImage;
 	bool isGridVisible;
+	ESodaShapes currentBrush;
 };
 
 extern FSodaProperties gCurrentProperties;
@@ -111,15 +130,11 @@ class FSodaDrawCommand : public FSodaCommand
 {
 public:
 
-	FSodaDrawCommand(Image* imageToDrawOn)
+	FSodaDrawCommand(Image* imageToDrawOn, std::set<FPixel>&& newPixels_, std::set<FPixel>&& oldPixels_)
 		: image(imageToDrawOn)
+		, newPixels(std::move(newPixels_))
+		, oldPixels(std::move(oldPixels_))
 	{
-	}
-
-	void addPixel(int x, int y, const Colour& colour)
-	{
-		oldPixels.emplace(x, y, image->getPixelAt(x, y));
-		newPixels.emplace(x, y, colour);
 	}
 
 	virtual bool execute(SodaCanvas* canvas)
@@ -129,7 +144,7 @@ public:
 		for (auto& newPixel : newPixels)
 		{
 			//retrieve previous color of pixel before we color on it
-			oldPixels.emplace(newPixel.x, newPixel.y, image->getPixelAt(newPixel.x, newPixel.y));
+			//oldPixels.emplace(newPixel.x, newPixel.y, image->getPixelAt(newPixel.x, newPixel.y));
 			//set the new color of the pixel
 			image->setPixelAt(newPixel.x, newPixel.y, newPixel.colour);
 		}
@@ -145,7 +160,7 @@ public:
 			image->setPixelAt(oldPixel.x, oldPixel.y, oldPixel.colour);
 		}
 		//once we finish we clear the oldPixels struct since we will  emplace them back when we execute the command again 
-		oldPixels.clear();
+		//oldPixels.clear();
 		return true;
 	}
 

@@ -57,18 +57,30 @@ public:
     void buttonClicked (Button* buttonThatWasClicked) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
+    // Binary resources:
+    static const char* freeDrawIcon_png;
+    static const int freeDrawIcon_pngSize;
+    static const char* circleIcon_png;
+    static const int circleIcon_pngSize;
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+
+	//A Map that indicates which button is mapped to which SodaShape (brushType)
+	// if a button is clicked, we can immediately search here
+	std::map<ImageButton*, ESodaShapes> brushTypeMap;
+
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<GroupComponent> brushGroup;
     std::unique_ptr<TextButton> paletteButton;
-    std::unique_ptr<GroupComponent> layerGroup;
+    std::unique_ptr<GroupComponent> brushTypeGroup;
     std::unique_ptr<Slider> brushSlider;
     std::unique_ptr<Label> label;
+    std::unique_ptr<ImageButton> freeStyle;
+    std::unique_ptr<ImageButton> circleStyle;
 
 
     //==============================================================================

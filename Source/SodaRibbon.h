@@ -61,6 +61,8 @@ public:
     static const int redoIcon_pngSize;
     static const char* openIcon_png2;
     static const int openIcon_png2Size;
+    static const char* undoIcon_png2;
+    static const int undoIcon_png2Size;
 
 
 private:

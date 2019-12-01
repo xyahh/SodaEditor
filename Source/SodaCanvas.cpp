@@ -36,7 +36,6 @@ SodaCanvas::SodaCanvas ()
 	pixelSize = 10;
 	layers.emplace_back(64, 64, pixelSize);
 	setActiveLayer(0);
-	drawCommand = nullptr;
     //[/Constructor_pre]
 
 
@@ -119,11 +118,8 @@ void SodaCanvas::resized()
 void SodaCanvas::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
-
-	//draw if the mouse is down
-	if(!drawCommand)
-		drawCommand = new FSodaDrawCommand(layers[activeLayer].getLayerImage());
-	layers[activeLayer].draw(e, drawCommand);
+	isDrawing = true;
+	layers[activeLayer].startDraw(e);
 
     //[/UserCode_mouseDown]
 }
@@ -131,12 +127,8 @@ void SodaCanvas::mouseDown (const MouseEvent& e)
 void SodaCanvas::mouseDrag (const MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
-
-	//mouse down may not be called if we drag from outside the window so also check here
-	if (!drawCommand)
-		drawCommand = new FSodaDrawCommand(layers[activeLayer].getLayerImage());
-	//draw if the mouse is being dragged around
-	layers[activeLayer].draw(e, drawCommand);
+	isDrawing = true;
+	layers[activeLayer].draw(e);
 
     //[/UserCode_mouseDrag]
 }
@@ -145,19 +137,25 @@ void SodaCanvas::mouseUp (const MouseEvent& e)
 {
     //[UserCode_mouseUp] -- Add your code here...
 
-	//check if we were drawing from the start
-	if (drawCommand)
+	std::set<FPixel> newPixels;
+	std::set<FPixel> oldPixels;
+
+	//end draw and get all the pixels that were drawn in the process
+	layers[activeLayer].endDraw(e, &newPixels, &oldPixels);
+	if (!newPixels.empty() && !oldPixels.empty())
 	{
-		if(drawCommand->isValid())
-		//we just emplace when mouse is Up
-		// because we were drawing as we went! no need to execute!
-			registerNewCommand(drawCommand, false);
-		else
-		{
-			delete drawCommand;
-		}
+		//if newPixels & oldPixels have size then we add the Draw command
+		// but DONT execute it since it already happened.
+		registerNewCommand(
+			new FSodaDrawCommand(
+				layers[activeLayer].getLayerImage(),
+				std::move(newPixels),
+				std::move(oldPixels)
+			), false
+		);
 	}
-	drawCommand = nullptr;
+
+	isDrawing = false;
 
     //[/UserCode_mouseUp]
 }
@@ -165,8 +163,10 @@ void SodaCanvas::mouseUp (const MouseEvent& e)
 bool SodaCanvas::keyPressed (const KeyPress& key)
 {
     //[UserCode_keyPressed] -- Add your code here...
+
 	//Check if we are not DRAWING!
-	if (!drawCommand)
+	//Only process commands like Undo/redo if we are not drawing!
+	if (!isDrawing)
 	{
 		if (key == KeyPress('z', ModifierKeys::ctrlModifier, 'z'))
 		{
@@ -192,7 +192,7 @@ bool SodaCanvas::keyPressed (const KeyPress& key)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void SodaCanvas::update()
 {
-	layers[activeLayer].update(drawCommand);
+	layers[activeLayer].update();
 }
 
 bool SodaCanvas::setActiveLayer(size_t index)
@@ -246,7 +246,7 @@ void SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)
 bool SodaCanvas::undo()
 {
 	//don't process if stack empty or currently drawing
-	if (undoStack.empty() || drawCommand)
+	if (undoStack.empty() || isDrawing)
 		return false;
 
 	//check out top and pop right after
@@ -272,7 +272,7 @@ bool SodaCanvas::undo()
 bool SodaCanvas::redo()
 {
 	//don't process if stack empty or currently drawing
-	if (redoStack.empty() || drawCommand) return false;
+	if (redoStack.empty() || isDrawing) return false;
 
 	//check out top and pop right after
 	FSodaCommand* redoCommand = redoStack.top();
@@ -293,6 +293,21 @@ bool SodaCanvas::redo()
 	}
 	return false;
 }
+
+void SodaCanvas::saveCanvasToFile(const String & filename, bool layerPerFile)
+{
+	//if (!layerPerFile)
+	//{
+	//	
+	//
+	//
+	//	FileOutputStream stream(File(filename));
+	//	PNGImageFormat pngWriter;
+	//	
+	//
+	//}
+}
+
 
 //[/MiscUserCode]
 

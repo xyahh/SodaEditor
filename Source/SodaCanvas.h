@@ -63,6 +63,15 @@ public:
 	bool undo();
 	bool redo();
 
+	/* Saves the Canvas to file
+	@param filename: The destination of the image(s). if it's more
+	than one image, each image will be named with a number appended
+	(i.e. filename_1, filename_2, filename_3...)
+	@layerPerFile: if to save  1 layer per file or to save all of the
+	layers in one single grid.
+	*/
+	void saveCanvasToFile(const String& filename, bool layerPerFile);
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -147,12 +156,9 @@ private:
 	float	initialMultiple;
 
 	/*
-	We will use this to continue adding points to this command while we hold the mouse down (i.e. while drawing takes place)
-	When the mouse is up, the DrawingCommand finishes and we push it to the undostack.
-	We can also use this to check if we are currently drawing. If this is "NULLPTR" then that means that no drawing is taking place.
-	If it's not a NULLPTR, then Drawing is taking place!
+	bool to inform whether we are currently drawing/erasing to the screen
 	*/
-	FSodaDrawCommand* drawCommand;
+	bool isDrawing;
     //[/UserVariables]
 
     //==============================================================================

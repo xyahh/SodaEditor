@@ -2,10 +2,6 @@
 
 <JUCERPROJECT id="RB9Owt" name="SodaEditor" projectType="guiapp" jucerVersion="5.4.5">
   <MAINGROUP id="mNrZiT" name="SodaEditor">
-    <GROUP id="{85B482FC-DA0E-5996-038F-6CCC2DD17FD2}" name="Utility">
-      <FILE id="DqhbQb" name="Delegate.cpp" compile="1" resource="0" file="Source/Delegate.cpp"/>
-      <FILE id="I7GORw" name="Delegate.h" compile="0" resource="0" file="Source/Delegate.h"/>
-    </GROUP>
     <GROUP id="{34957632-4911-CD7F-553F-2DCA72E199A9}" name="Soda">
       <FILE id="c60nFW" name="SodaGlobals.h" compile="0" resource="0" file="Source/SodaGlobals.h"/>
       <FILE id="nr6K1V" name="SodaGlobals.cpp" compile="1" resource="0" file="Source/SodaGlobals.cpp"/>

@@ -47,7 +47,7 @@ SodaLayer::SodaLayer (int width_, int height_, int pixelSize_)
 
 	//Creating an Image of Width * Height and ARGB format
 	//layer_image = Image(Image::RGB, layer_width, layer_height, true);
-
+	isDrawing = false;
 	image = Image(Image::ARGB, layer_width, layer_height, true);
     //[/Constructor]
 }
@@ -90,65 +90,140 @@ void SodaLayer::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void SodaLayer::update(FSodaDrawCommand* drawCommand)
+void SodaLayer::update()
 {
-
 	//avoid calc if these two are the same
 	if (PreviousMouseCoords == CurrentMouseCoords) return;
+	if (!isDrawing) return;
 
 	//Convert the Previous Mouse Coords and Current to start the line check
 	auto StartPoint = ConvertPosition(PreviousMouseCoords).toFloat();
 	auto EndPoint = ConvertPosition(CurrentMouseCoords).toFloat();
-
-	auto Vector = EndPoint - StartPoint;
-
-	//normalize the direction of
-	float Dist = Vector.getDistanceFromOrigin();
-	Vector /= Dist;
+	auto PivotPoint = ConvertPosition(PivotMouseCoords).toFloat();
 
 	PreviousMouseCoords = CurrentMouseCoords;
 
-	//set the Color of the pixel at each square that we came across from Start to End
-	for (float i = 0.f; i < Dist; i += 0.25f)
-		drawAt(StartPoint.x + Vector.x * i, StartPoint.y + Vector.y*i, gCurrentProperties.brushSize, gCurrentProperties.brushColour, drawCommand);
+	//proc behavior of what we just calculated depending on the currentBrush
+	switch (gCurrentProperties.currentBrush)
+	{
+	case ESodaShapes::FreeStyle:
+	{
+		auto Vector = EndPoint - StartPoint;
+		//normalize the direction of the Vector from Prev->Curr
+		float Dist = Vector.getDistanceFromOrigin();
+
+		Vector /= Dist;
+		//set the Color of the pixel at each square that we came across from Start to End
+		for (float i = 0.f; i <= Dist; i += 0.25f)
+			drawPixel(StartPoint.x + Vector.x * i, StartPoint.y + Vector.y*i, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+	}
+	break;
+	//Mid-Point Circle Drawing Algorithm.
+	//code source: https://www.geeksforgeeks.org/mid-point-circle-drawing-algorithm/
+	case ESodaShapes::Circle:
+	{
+		auto Vector = EndPoint - PivotPoint;
+		//normalize the direction of the Vector from Pivot->Curr
+		float Dist = Vector.getDistanceFromOrigin();
+		resetDrawings();
+		if (Dist >= 10)
+			Dist = Dist;
+		int x = Dist, y = 0;
+		int P = 1 - Dist;
+		while (x > y)
+		{
+			++y;
+			// Mid-point is inside or on the perimeter
+			if (P <= 0)
+				P = P + 2 * y + 1;
+			// Mid-point is outside the perimeter
+			else
+			{
+				--x;
+				P = P + 2 * y - 2 * x + 1;
+			}
+			// All the perimeter points have already been printed
+			if (x < y)
+				break;
+
+			// Drawing the generated point and its reflection
+			// in the other octants after translation
+			drawPixel(+x + PivotPoint.x, +y + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+			drawPixel(-x + PivotPoint.x, +y + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+			drawPixel(+x + PivotPoint.x, -y + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+			drawPixel(-x + PivotPoint.x, -y + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+			// If the generated point is on the line x = y then
+			// the perimeter points have already been printed
+			if (x != y)
+			{
+				drawPixel(+y + PivotPoint.x, +x + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+				drawPixel(-y + PivotPoint.x, +x + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+				drawPixel(+y + PivotPoint.x, -x + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+				drawPixel(-y + PivotPoint.x, -x + PivotPoint.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+			}
+		}
+
+
+
+		break;
+	}
+	case ESodaShapes::Rectangle:
+		break;
+	}
+
+
+
+
+
 }
 
-void SodaLayer::draw(const MouseEvent & e, FSodaDrawCommand* drawCommand)
+void SodaLayer::startDraw(const MouseEvent & e)
+{
+	NewPixels.clear();
+	OldPixels.clear();
+
+	CurrentMouseCoords = e.getPosition();
+	PreviousMouseCoords = CurrentMouseCoords;
+	PivotMouseCoords = CurrentMouseCoords;
+
+	//draw the first pixel
+	auto Coord = ConvertPosition(PreviousMouseCoords);
+	drawPixel(Coord.x, Coord.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour);
+	isDrawing = true;
+}
+
+void SodaLayer::draw(const MouseEvent & e)
 {
 	CurrentMouseCoords = e.getPosition();
-
-	//if the mouse was clicked, make prev mouse equal to current
-	// and set pixel
-	if (e.mouseWasClicked())
-	{
-		PreviousMouseCoords = CurrentMouseCoords;
-		auto Coord = ConvertPosition(PreviousMouseCoords);
-		drawAt(Coord.x, Coord.y, gCurrentProperties.brushSize, gCurrentProperties.brushColour, drawCommand);
-	}
-
 }
 
-void SodaLayer::drawAt(int X, int Y, int brushSize, const Colour & colour, FSodaDrawCommand* drawCommand)
+void SodaLayer::resetDrawings()
 {
-	if (drawCommand)
+	FSodaDrawCommand drawCommand(&image, std::move(NewPixels), std::move(OldPixels));
+	drawCommand.undo(nullptr);
+}
+
+void SodaLayer::endDraw(const MouseEvent & e, std::set<FPixel>* outNewPixels, std::set<FPixel>* outOldPixels)
+{
+	isDrawing = false;
+	*outNewPixels = std::move(NewPixels);
+	*outOldPixels = std::move(OldPixels);
+	resetDrawings();
+}
+
+void SodaLayer::drawPixel(int X, int Y, int brushSize, const Colour & colour)
+{
+	int rangeY = (brushSize - 1);
+	for (int dy = -rangeY; dy <= rangeY; ++dy)
 	{
-		if (X >= 0 && X < image.getWidth() && Y >= 0 && Y < image.getHeight())
+		int rangeX = (2 * (brushSize - abs(dy)) - 1) / 2;
+		for (int dx = -rangeX; dx <= rangeX; ++ dx)
 		{
-			drawCommand->addPixel(X, Y, colour);
-			image.setPixelAt(X, Y, colour);
-		}
-	}
-	if (brushSize > 1)
-	{
-		//probably not the most efficient way to draw a thick brush
-		//but it's certainly the shortest/fastest way to do so ;)
-		//ToDO: Optimize this!!
-		for (int i = 1; i < brushSize; ++i)
-		{
-			drawAt(X + i, Y, brushSize - 1, colour, drawCommand);
-			drawAt(X, Y + i, brushSize - 1, colour, drawCommand);
-			drawAt(X - i, Y, brushSize - 1, colour, drawCommand);
-			drawAt(X, Y - i, brushSize - 1, colour, drawCommand);
+			int px = X + dx;
+			int py = Y + dy;
+			OldPixels.emplace(px, py, image.getPixelAt(px, py));
+			image.setPixelAt(px, py, colour);
+			NewPixels.emplace(px, py, colour);
 		}
 	}
 }
