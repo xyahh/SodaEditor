@@ -187,7 +187,7 @@ void SodaProperties::resized()
     circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3000f), 250 + 45, proportionOfWidth (0.3000f), 25);
     lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
     rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3000f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }

@@ -2,6 +2,12 @@
 
 <JUCERPROJECT id="RB9Owt" name="SodaEditor" projectType="guiapp" jucerVersion="5.4.5">
   <MAINGROUP id="mNrZiT" name="SodaEditor">
+    <GROUP id="{C97AD44F-EC58-30C4-14F1-C4838DD78968}" name="Third Party">
+      <FILE id="u9OAXZ" name="DraggableListBox.cpp" compile="1" resource="0"
+            file="Source/DraggableListBox.cpp"/>
+      <FILE id="l111pB" name="DraggableListBox.h" compile="0" resource="0"
+            file="Source/DraggableListBox.h"/>
+    </GROUP>
     <GROUP id="{50CCAB3F-A3EE-F740-2A8F-D4C02EF77AAE}" name="BrushTypes">
       <FILE id="hTgkwd" name="SodaBrush.cpp" compile="1" resource="0" file="Source/SodaBrush.cpp"/>
       <FILE id="TJ9i2X" name="SodaBrush.h" compile="0" resource="0" file="Source/SodaBrush.h"/>
@@ -15,9 +21,12 @@
             file="Source/SodaLineBrush.cpp"/>
       <FILE id="o1kVmZ" name="SodaRectBrush.cpp" compile="1" resource="0"
             file="Source/SodaRectBrush.cpp"/>
-      <FILE id="unY72A" name="SodaRectBrush.h" compile="0" resource="0" file="Source/SodaRectBrush.h"/>
     </GROUP>
     <GROUP id="{34957632-4911-CD7F-553F-2DCA72E199A9}" name="Soda">
+      <FILE id="YntSfv" name="SodaLayerBoxList.cpp" compile="1" resource="0"
+            file="Source/SodaLayerBoxList.cpp"/>
+      <FILE id="g6ZP2b" name="SodaLayerBoxList.h" compile="0" resource="0"
+            file="Source/SodaLayerBoxList.h"/>
       <FILE id="XKSRmF" name="SodaCommand.cpp" compile="1" resource="0" file="Source/SodaCommand.cpp"/>
       <FILE id="VQDbo1" name="SodaCommand.h" compile="0" resource="0" file="Source/SodaCommand.h"/>
       <FILE id="c60nFW" name="SodaGlobals.h" compile="0" resource="0" file="Source/SodaGlobals.h"/>

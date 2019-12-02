@@ -117,6 +117,10 @@ public:
 	virtual bool execute(SodaCanvas* canvas);
 	virtual bool undo(SodaCanvas* canvas);
 
+	virtual bool isValid()
+	{
+		return true;
+	}
 
 private:
 	size_t layerToActivate;
@@ -127,16 +131,43 @@ private:
 /*
 
 */
-class FSodaCreateLayerCommand
+class FSodaCreateLayerCommand : public FSodaCommand
 {
+public:
+	FSodaCreateLayerCommand() {}
 
+	virtual bool execute(SodaCanvas* canvas);
+	virtual bool undo(SodaCanvas* canvas);
+
+	virtual bool isValid() const override
+	{
+		return true;
+	}
+
+private:
+	size_t Index;
 };
 
 /*
 This command was separated from the CreateLayer command because we do
 care what was deleted! It must be stored somewhere so here is where we stoered what we deleted
 */
-class FSodaDeleteLayerCommand
+class FSodaDeleteLayerCommand : public FSodaCommand
 {
+public:
 
+	FSodaDeleteLayerCommand(size_t Index_) : Index(Index_) {}
+	virtual ~FSodaDeleteLayerCommand() {}
+
+	virtual bool execute(SodaCanvas* canvas);
+	virtual bool undo(SodaCanvas* canvas);
+
+	virtual bool isValid() const override
+	{
+		return true;
+	}
+
+private:
+	size_t Index;
+	Image  image;
 };

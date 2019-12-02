@@ -53,6 +53,10 @@ public:
     // Binary resources:
     static const char* playIcon_png;
     static const int playIcon_pngSize;
+    static const char* reverseIcon_png;
+    static const int reverseIcon_pngSize;
+    static const char* playIcon_png2;
+    static const int playIcon_png2Size;
 
 
 private:
@@ -60,7 +64,8 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<ImageButton> imageButton;
+    std::unique_ptr<ImageButton> playButton;
+    std::unique_ptr<ImageButton> revereButton;
 
 
     //==============================================================================

@@ -49,6 +49,33 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	virtual void update();
 
+	/*
+	@ Creates a Layer and sets it as Active.
+	@ it also pushes the layer creation command into the undo stack.
+	*/
+	size_t createLayer();
+
+	/*
+	@ Deletes the designated layer. If it was the active layer, the program will look
+	for the next active layer and set it as Active.
+	@ It also pushes the layer deletion command, which contains a copy of what was deleted, into
+	the undo stack.
+	*/
+	void deleteLayer(size_t index);
+
+	/*
+	@ Swaps a Subject/Target layer with another Layer
+	*/
+	void swapLayers(size_t targetLayer, size_t otherLayer);
+
+	/*
+	@ Sets the Animation Playback
+	@ bool: Sets the "isPlaying" flag.
+	@ If true, the Sprites animation will start playing
+	@ if False,
+	*/
+	void setPlayback(ESodaPlayback PlaybackType_);
+
 	/* Sets Active Layer by first Deactivating the Currently active one and then
 	activating the new one
 	@ returns true if the index was in range & was activated. false if out of range
@@ -60,6 +87,18 @@ public:
 	*/
 	bool getActiveLayer(size_t* outIndex) const;
 
+	/*
+	Gets current Active Layer as a pointer
+	@ returns true if 
+	*/
+	bool getLayer(size_t Index, SodaLayer** outLayer);
+
+	void resizeLayer(SodaLayer& layer);
+	/*
+	Pushes a NEW command into the Undo Stack and
+	deletes all the commands from the redo stack as we are writing
+	a new timeline of commands
+	*/
 	void registerNewCommand(FSodaCommand* command, bool execute);
 	bool undo();
 	bool redo();
@@ -114,6 +153,11 @@ private:
 	int pixelSize;
 
 	/*
+	the current Resolution of the Canvas
+	*/
+	int resolution;
+
+	/*
 	The bounds defined by the layer. Used to draw the grid
 	*/
 	Rectangle<int> layerBounds;
@@ -156,10 +200,19 @@ private:
 	float	lowestMultiple;
 	float	initialMultiple;
 
+
+	/*
+	Informs the type of Playback currently occurring.
+	Whether it is playing or it's stopped, or what other actions can be performed on the
+	deque of layers.
+	*/
+	ESodaPlayback PlaybackType;
+
 	/*
 	bool to inform whether we are currently drawing/erasing to the screen
 	*/
 	bool isDrawing;
+
     //[/UserVariables]
 
     //==============================================================================

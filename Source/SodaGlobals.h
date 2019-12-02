@@ -12,6 +12,19 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include <set>
 
+/*
+@ Soda Playback Enum Class
+@ Used to identify the current playback
+*/
+enum class ESodaPlayback
+{
+	Pause,
+	ForwardPlay,
+	ReversePlay,
+	//NextFrame,
+	//PreviousFrame,
+};
+
 class FSodaBrush;
 
 /* Soda Properties

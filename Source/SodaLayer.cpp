@@ -40,11 +40,11 @@ SodaLayer::SodaLayer (int width_, int height_, int pixelSize_)
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
+    setSize (1, 1);
 
 
     //[Constructor] You can add your own custom stuff here..
-
+	setSize(layer_width * layer_pixelSize, layer_height * layer_pixelSize);
 	//Creating an Image of Width * Height and ARGB format
 	image = Image(Image::ARGB, layer_width, layer_height, true);
     //[/Constructor]
@@ -157,7 +157,7 @@ BEGIN_JUCER_METADATA
                  parentClasses="public Component" constructorParams="int width_, int height_, int pixelSize_"
                  variableInitialisers="layer_width(width_),&#10;layer_height(height_),&#10;layer_pixelSize(pixelSize_)&#10;&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="0"/>
 </JUCER_COMPONENT>
 

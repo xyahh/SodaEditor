@@ -22,6 +22,8 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SodaCanvas.h"
+#include "SodaLayerBoxList.h"
+#include <map>
 //[/Headers]
 
 
@@ -34,7 +36,8 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class SodaToolbox  : public AnimatedAppComponent
+class SodaToolbox  : public AnimatedAppComponent,
+                     public Button::Listener
 {
 public:
     //==============================================================================
@@ -43,22 +46,35 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void update() override {}
+	void update() override;
+
+	void createLayer();
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+
+	SodaCanvas*		sodaCanvas;
+
 	Rectangle<float> previewRectangle;
+
+	LayerListBoxItemData itemData;
+	LayerListBoxModel listBoxModel;
+	DraggableListBox  listBox;
+
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<GroupComponent> imagePreview;
-    std::unique_ptr<GroupComponent> groupComponent;
+    std::unique_ptr<GroupComponent> layerGroup;
+    std::unique_ptr<TextButton> createLayerButton;
 
 
     //==============================================================================

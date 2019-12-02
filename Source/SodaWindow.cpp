@@ -89,7 +89,7 @@ void SodaWindow::resized()
 
     sodaCanvas->setBounds (210, 110, getWidth() - 520, getHeight() - 220);
     ribbonComponent->setBounds (0, 0, proportionOfWidth (1.0000f), 100);
-    toolBoxComponent->setBounds (getWidth() - 300, getHeight() - (getHeight() - 100), 300, getHeight() - 100);
+    toolBoxComponent->setBounds (getWidth() - 8 - 300, getHeight() - -4 - (getHeight() - 100), 300, getHeight() - 100);
     playerComponent->setBounds (200, getHeight() - 100, getWidth() - 500, 100);
     propertiesComponent->setBounds (0, getHeight() - (getHeight() - 100), 200, getHeight() - 100);
     //[UserResized] Add your own custom resize handling here..
@@ -123,7 +123,7 @@ BEGIN_JUCER_METADATA
              explicitFocusOrder="0" pos="0 0 100% 100" sourceFile="SodaRibbon.cpp"
              constructorParams="sodaCanvas.get()"/>
   <JUCERCOMP name="" id="ad762a75b3155bc8" memberName="toolBoxComponent" virtualName=""
-             explicitFocusOrder="0" pos="0Rr 0Rr 300 100M" sourceFile="SodaToolbox.cpp"
+             explicitFocusOrder="0" pos="8Rr -4Rr 300 100M" sourceFile="SodaToolbox.cpp"
              constructorParams="sodaCanvas.get()"/>
   <JUCERCOMP name="" id="abe5338cd2654eaa" memberName="playerComponent" virtualName=""
              explicitFocusOrder="0" pos="200 0Rr 500M 100" sourceFile="SodaPlayer.cpp"

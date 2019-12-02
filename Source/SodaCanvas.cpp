@@ -34,8 +34,8 @@ SodaCanvas::SodaCanvas ()
 
 	//set pixel size 10 as default.
 	pixelSize = 10;
-	layers.emplace_back(64, 64, pixelSize);
-	setActiveLayer(0);
+	resolution = 64; //64x64 resolution
+	
     //[/Constructor_pre]
 
 
@@ -47,6 +47,7 @@ SodaCanvas::SodaCanvas ()
 
     //[Constructor] You can add your own custom stuff here..
 		//for now only have one layer at init time
+	createLayer();
 	setFramesPerSecond(60); //match these two
 	setWantsKeyboardFocus(true);
 
@@ -70,8 +71,6 @@ void SodaCanvas::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colours::black);
-
     //[UserPaint] Add your own custom painting code here..
 
 	//want to have the feeling of pixel drawing. prevent from one pixel to be influenced by other pixel colours.
@@ -80,7 +79,8 @@ void SodaCanvas::paint (Graphics& g)
 	/* Paint Layers in order from 0 to End.
 	@ We are not adding them as childs because they would be
 	*/
-	layers[activeLayer].paint(g);
+	if (layers.size() > 0)
+		layers[activeLayer].paint(g);
 
 	//draw Grid begin
 	if (gProperties.isGridVisible)
@@ -105,13 +105,16 @@ void SodaCanvas::paint (Graphics& g)
 void SodaCanvas::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
+	int CanvasWidth = getWidth();
+	int CanvasHeight = getHeight();
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
 	for (auto& i : layers)
-		i.setBounds((getWidth() / 2) - (i.getWidth() /2 ), (getHeight() / 2) - (i.getHeight()/ 2), 64 * pixelSize, 64 * pixelSize);
+		resizeLayer(i);
 
-	layerBounds = layers[activeLayer].getBounds();
+	if(layers.size() > 0)
+		layerBounds = layers[activeLayer].getBounds();
     //[/UserResized]
 }
 
@@ -119,7 +122,8 @@ void SodaCanvas::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
 	isDrawing = true;
-	layers[activeLayer].startDraw(e);
+	if (layers.size() > 0)
+		layers[activeLayer].startDraw(e);
 
     //[/UserCode_mouseDown]
 }
@@ -128,7 +132,8 @@ void SodaCanvas::mouseDrag (const MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
 	isDrawing = true;
-	layers[activeLayer].updateMousePos(e);
+	if (layers.size() > 0)
+		layers[activeLayer].updateMousePos(e);
 
     //[/UserCode_mouseDrag]
 }
@@ -137,20 +142,24 @@ void SodaCanvas::mouseUp (const MouseEvent& e)
 {
     //[UserCode_mouseUp] -- Add your code here...
 
-	std::set<FPixel> Pixels;
 	//end draw and get all the pixels that were drawn in the process
-	layers[activeLayer].endDraw(e, &Pixels);
-	if (!Pixels.empty())
+	if (layers.size() > 0)
 	{
-		//if newPixels & oldPixels have size then we add the Draw command
-		// but DONT execute it since it already happened.
-		registerNewCommand(
-			new FSodaDrawCommand(
-				layers[activeLayer].getLayerImage(),
-				std::move(Pixels)
-			), false
-		);
+		std::set<FPixel> Pixels;
+		layers[activeLayer].endDraw(e, &Pixels);
+		if (!Pixels.empty())
+		{
+			//if newPixels & oldPixels have size then we add the Draw command
+			// but DONT execute it since it already happened.
+			registerNewCommand(
+				new FSodaDrawCommand(
+					layers[activeLayer].getLayerImage(),
+					std::move(Pixels)
+				), false
+			);
+		}
 	}
+	
 	isDrawing = false;
 
     //[/UserCode_mouseUp]
@@ -183,12 +192,38 @@ bool SodaCanvas::keyPressed (const KeyPress& key)
     //[/UserCode_keyPressed]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void SodaCanvas::update()
 {
-	layers[activeLayer].update();
+	if (layers.size() > 0)
+		layers[activeLayer].update();
+}
+
+size_t SodaCanvas::createLayer()
+{
+	layers.emplace_back(resolution, resolution, pixelSize);
+	size_t Index = layers.size() - 1;
+	//set bounds so that we see the layer at the center
+	setActiveLayer(Index);
+
+	//resize the layer to be at the center
+	resizeLayer(layers.back());
+
+	registerNewCommand(new FSodaCreateLayerCommand, false);
+	return Index;
+}
+
+void SodaCanvas::deleteLayer(size_t index)
+{
+}
+
+void SodaCanvas::swapLayers(size_t targetLayer, size_t otherLayer)
+{
+}
+
+void SodaCanvas::setPlayback(ESodaPlayback PlaybackType_)
+{
+	PlaybackType = PlaybackType_;
 }
 
 bool SodaCanvas::setActiveLayer(size_t index)
@@ -219,6 +254,29 @@ bool SodaCanvas::getActiveLayer(size_t * outIndex) const
 		return true;
 	}
 	return false;
+}
+
+bool SodaCanvas::getLayer(size_t Index, SodaLayer** outLayer)
+{
+	if (Index >= 0 && Index < layers.size())
+	{
+		//change the outindex to the active layer if valid and return true
+		*outLayer = &layers[Index];
+		return true;
+	}
+	return false;
+}
+
+void SodaCanvas::resizeLayer(SodaLayer & layer)
+{
+	int LayerWidth = layer.getWidth();
+	int LayerHeight = layer.getHeight();
+
+	layer.setBounds
+	((getWidth() / 2) - (LayerWidth / 2)
+		, (getHeight() / 2) - (LayerHeight / 2)
+		, resolution * pixelSize
+		, resolution * pixelSize);
 }
 
 void SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)
@@ -327,7 +385,7 @@ BEGIN_JUCER_METADATA
     <METHOD name="mouseDrag (const MouseEvent&amp; e)"/>
     <METHOD name="keyPressed (const KeyPress&amp; key)"/>
   </METHODS>
-  <BACKGROUND backgroundColour="ff000000"/>
+  <BACKGROUND backgroundColour="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
