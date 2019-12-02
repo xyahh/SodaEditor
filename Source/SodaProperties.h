@@ -62,6 +62,12 @@ public:
     static const int freeDrawIcon_pngSize;
     static const char* circleIcon_png;
     static const int circleIcon_pngSize;
+    static const char* lineIcon_png;
+    static const int lineIcon_pngSize;
+    static const char* rectIcon_png;
+    static const int rectIcon_pngSize;
+    static const char* eraserIcon_png;
+    static const int eraserIcon_pngSize;
 
 
 private:
@@ -76,6 +82,9 @@ private:
     std::unique_ptr<Label> label;
     std::unique_ptr<ImageButton> freeStyle;
     std::unique_ptr<ImageButton> circleStyle;
+    std::unique_ptr<ImageButton> lineStyle;
+    std::unique_ptr<ImageButton> rectStyle;
+    std::unique_ptr<ImageButton> eraserStyle;
 
 
     //==============================================================================

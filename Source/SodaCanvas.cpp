@@ -294,12 +294,12 @@ void SodaCanvas::saveCanvasToFile(const String & filename, bool layerPerFile)
 {
 	//if (!layerPerFile)
 	//{
-	//	
+	//
 	//
 	//
 	//	FileOutputStream stream(File(filename));
 	//	PNGImageFormat pngWriter;
-	//	
+	//
 	//
 	//}
 }

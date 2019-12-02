@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    SodaFreeStyleBrush.cpp
-    Created: 2 Dec 2019 6:49:54pm
+    SodaEraserBrush.cpp
+    Created: 2 Dec 2019 9:50:51pm
     Author:  Juan
 
   ==============================================================================
@@ -10,7 +10,7 @@
 
 #include "SodaBrush.h"
 
-void FSodaFreeBrush::updateDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)
+void FSodaEraserBrush::updateDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)
 {
 	//save current PixelUndermouse to a variable so that we can know the prev value after it changes 
 	// in the preupdate
@@ -28,5 +28,5 @@ void FSodaFreeBrush::updateDraw(Image * image, const Point<float>& CurrentPixelU
 		drawPixel(image,
 			PrevPixelUnderMouse.x + Vector.x * i, // X + dX
 			PrevPixelUnderMouse.y + Vector.y * i, // Y + dY
-			gProperties.brushSize, gProperties.brushColour);
+			gProperties.brushSize, Colours::transparentBlack);
 }

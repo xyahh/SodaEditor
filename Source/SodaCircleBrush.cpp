@@ -14,25 +14,25 @@
 //Mid-Point Circle Drawing Algorithm.
 //code source: https://www.geeksforgeeks.org/mid-point-circle-drawing-algorithm/
 
-void FSodaCircleBrush::startDraw(Image * i, const Point<float>& CurrentPixelUnderMouse)
+void FSodaCircleBrush::startDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)
 {
-	FSodaBrush::startDraw(i, CurrentPixelUnderMouse);
+	FSodaBrush::startDraw(image, CurrentPixelUnderMouse);
 	originPoint = CurrentPixelUnderMouse;
 }
 
-void FSodaCircleBrush::updateDraw(Image * i, const Point<float>& CurrentPixelUnderMouse_)
+void FSodaCircleBrush::updateDraw(Image * image, const Point<float>& CurrentPixelUnderMouse_)
 {
 	if (!FSodaBrush::preUpdateDraw(CurrentPixelUnderMouse_)) return;
 
 	auto Vector = CurrentPixelUnderMouse_ - originPoint;
 
 	float Dist = Vector.getDistanceFromOrigin();
-	resetPixels(i);
+	resetPixels(image);
 
 	int x = Dist, y = 0;
 
 	//(r, 0)
-	drawPixel(i,
+	drawPixel(image,
 		+x + originPoint.x,
 		originPoint.y
 		, gProperties.brushSize, gProperties.brushColour);
@@ -43,19 +43,19 @@ void FSodaCircleBrush::updateDraw(Image * i, const Point<float>& CurrentPixelUnd
 	if (Dist > 0)
 	{
 		//(-r, 0)
-		drawPixel(i, 
+		drawPixel(image, 
 			-x + originPoint.x,
 			originPoint.y
 			, gProperties.brushSize, gProperties.brushColour);
 
 		//(0, r)
-		drawPixel(i, 
+		drawPixel(image, 
 			originPoint.x,
 			+x + originPoint.y
 			, gProperties.brushSize, gProperties.brushColour);
 
 		//(0, -r)
-		drawPixel(i, 
+		drawPixel(image, 
 			originPoint.x,
 			-x + originPoint.y,
 			gProperties.brushSize, gProperties.brushColour);
@@ -81,25 +81,25 @@ void FSodaCircleBrush::updateDraw(Image * i, const Point<float>& CurrentPixelUnd
 
 		// Drawing the generated point and its reflection
 		// in the other octants after translation
-		drawPixel(i, +x + originPoint.x, +y + originPoint.y
+		drawPixel(image, +x + originPoint.x, +y + originPoint.y
 			, gProperties.brushSize, gProperties.brushColour);
-		drawPixel(i, -x + originPoint.x, +y + originPoint.y
+		drawPixel(image, -x + originPoint.x, +y + originPoint.y
 			, gProperties.brushSize, gProperties.brushColour);
-		drawPixel(i, +x + originPoint.x, -y + originPoint.y
+		drawPixel(image, +x + originPoint.x, -y + originPoint.y
 			, gProperties.brushSize, gProperties.brushColour);
-		drawPixel(i, -x + originPoint.x, -y + originPoint.y
+		drawPixel(image, -x + originPoint.x, -y + originPoint.y
 			, gProperties.brushSize, gProperties.brushColour);
 		// If the generated point is on the line x = y then
 		// the perimeter points have already been printed
 		if (x != y)
 		{
-			drawPixel(i, +y + originPoint.x, +x + originPoint.y
+			drawPixel(image, +y + originPoint.x, +x + originPoint.y
 				, gProperties.brushSize, gProperties.brushColour);
-			drawPixel(i, -y + originPoint.x, +x + originPoint.y
+			drawPixel(image, -y + originPoint.x, +x + originPoint.y
 				, gProperties.brushSize, gProperties.brushColour);
-			drawPixel(i, +y + originPoint.x, -x + originPoint.y
+			drawPixel(image, +y + originPoint.x, -x + originPoint.y
 				, gProperties.brushSize, gProperties.brushColour);
-			drawPixel(i, -y + originPoint.x, -x + originPoint.y
+			drawPixel(image, -y + originPoint.x, -x + originPoint.y
 				, gProperties.brushSize, gProperties.brushColour);
 		}
 	}

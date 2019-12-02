@@ -11,16 +11,20 @@
 #include "SodaBrush.h"
 #include "SodaCommand.h"
 
-FSodaFreeStyleBrush		FreeStyleBrush;
-FSodaCircleBrush		CircleBrush;
+//Extern Brushes initialized here 
+FSodaFreeBrush		SodaFreeBrush;
+FSodaCircleBrush	SodaCircleBrush;
+FSodaLineBrush		SodaLineBrush;
+FSodaRectBrush		SodaRectBrush;
+FSodaEraserBrush	SodaEraserBrush;
 
-void FSodaBrush::resetPixels(Image* i)
+void FSodaBrush::resetPixels(Image* image)
 {
-	FSodaDrawCommand drawCommand(i, std::move(Pixels));
+	FSodaDrawCommand drawCommand(image, std::move(Pixels));
 	drawCommand.undo(nullptr); //canvas can be nullptr here since we only deal with Image
 }
 
-void FSodaBrush::startDraw(Image * i, const Point<float>& CurrentPixelUnderMouse)
+void FSodaBrush::startDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)
 {
 	//clear the Pixels
 	Pixels.clear();
@@ -41,16 +45,16 @@ bool FSodaBrush::preUpdateDraw(const Point<float>& CurrentPixelUnderMouse)
 	return true;
 }
 
-void FSodaBrush::endDraw(Image* i, std::set<FPixel>* outPixels)
+void FSodaBrush::endDraw(Image* image, std::set<FPixel>* outPixels)
  {
 	//set drawing to false and commit the pixels to *outPixels
 	isDrawing = false;
 	*outPixels = std::move(Pixels);
 	// reset the Pixels by undoing any possible overdraw (this shouldn't happen, though)
-	resetPixels(i);
+	resetPixels(image);
  }
 
- void FSodaBrush::drawPixel(Image * i, int X, int Y, int brushSize, const Colour & colour)
+ void FSodaBrush::drawPixel(Image * image, int X, int Y, int brushSize, const Colour & colour)
  {
 
 
@@ -70,8 +74,8 @@ void FSodaBrush::endDraw(Image* i, std::set<FPixel>* outPixels)
 			 int px = X + dx;
 			 int py = Y + dy;
 			 //save the oldColour before setting the pixel so that we can empalce the correct original colour
-			 Colour oldColour = i->getPixelAt(px, py);
-			 i->setPixelAt(px, py, colour);
+			 Colour oldColour = image->getPixelAt(px, py);
+			 image->setPixelAt(px, py, colour);
 			 Pixels.emplace(px, py, colour, oldColour);
 		 }
 	 }
