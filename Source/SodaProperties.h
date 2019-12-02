@@ -66,11 +66,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-
-	//A Map that indicates which button is mapped to which SodaShape (brushType)
-	// if a button is clicked, we can immediately search here
-	std::map<ImageButton*, ESodaShapes> brushTypeMap;
-
     //[/UserVariables]
 
     //==============================================================================

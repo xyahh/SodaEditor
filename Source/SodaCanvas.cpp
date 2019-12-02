@@ -83,7 +83,7 @@ void SodaCanvas::paint (Graphics& g)
 	layers[activeLayer].paint(g);
 
 	//draw Grid begin
-	if (gCurrentProperties.isGridVisible)
+	if (gProperties.isGridVisible)
 	{
 		int layerX = layerBounds.getX();
 		int layerY = layerBounds.getY();
@@ -128,7 +128,7 @@ void SodaCanvas::mouseDrag (const MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
 	isDrawing = true;
-	layers[activeLayer].draw(e);
+	layers[activeLayer].updateMousePos(e);
 
     //[/UserCode_mouseDrag]
 }
@@ -137,24 +137,20 @@ void SodaCanvas::mouseUp (const MouseEvent& e)
 {
     //[UserCode_mouseUp] -- Add your code here...
 
-	std::set<FPixel> newPixels;
-	std::set<FPixel> oldPixels;
-
+	std::set<FPixel> Pixels;
 	//end draw and get all the pixels that were drawn in the process
-	layers[activeLayer].endDraw(e, &newPixels, &oldPixels);
-	if (!newPixels.empty() && !oldPixels.empty())
+	layers[activeLayer].endDraw(e, &Pixels);
+	if (!Pixels.empty())
 	{
 		//if newPixels & oldPixels have size then we add the Draw command
 		// but DONT execute it since it already happened.
 		registerNewCommand(
 			new FSodaDrawCommand(
 				layers[activeLayer].getLayerImage(),
-				std::move(newPixels),
-				std::move(oldPixels)
+				std::move(Pixels)
 			), false
 		);
 	}
-
 	isDrawing = false;
 
     //[/UserCode_mouseUp]
@@ -181,7 +177,7 @@ bool SodaCanvas::keyPressed (const KeyPress& key)
 	}
 
 	if (key == KeyPress('v'))
-		gCurrentProperties.isGridVisible = !gCurrentProperties.isGridVisible;
+		gProperties.isGridVisible = !gProperties.isGridVisible;
 
     return false;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
     //[/UserCode_keyPressed]

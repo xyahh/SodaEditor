@@ -11,7 +11,7 @@
 #include "SodaGlobals.h"
 #include "SodaCanvas.h"
 
-FSodaProperties gCurrentProperties;
+FSodaProperties gProperties;
 
 bool FSodaActivateLayerCommand::execute(SodaCanvas * canvas)
 {

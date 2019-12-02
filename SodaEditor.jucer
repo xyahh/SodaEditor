@@ -2,7 +2,17 @@
 
 <JUCERPROJECT id="RB9Owt" name="SodaEditor" projectType="guiapp" jucerVersion="5.4.5">
   <MAINGROUP id="mNrZiT" name="SodaEditor">
+    <GROUP id="{50CCAB3F-A3EE-F740-2A8F-D4C02EF77AAE}" name="BrushTypes">
+      <FILE id="hTgkwd" name="SodaBrush.cpp" compile="1" resource="0" file="Source/SodaBrush.cpp"/>
+      <FILE id="TJ9i2X" name="SodaBrush.h" compile="0" resource="0" file="Source/SodaBrush.h"/>
+      <FILE id="kuvG7e" name="SodaCircleBrush.cpp" compile="1" resource="0"
+            file="Source/SodaCircleBrush.cpp"/>
+      <FILE id="qRyljO" name="SodaFreeStyleBrush.cpp" compile="1" resource="0"
+            file="Source/SodaFreeStyleBrush.cpp"/>
+    </GROUP>
     <GROUP id="{34957632-4911-CD7F-553F-2DCA72E199A9}" name="Soda">
+      <FILE id="XKSRmF" name="SodaCommand.cpp" compile="1" resource="0" file="Source/SodaCommand.cpp"/>
+      <FILE id="VQDbo1" name="SodaCommand.h" compile="0" resource="0" file="Source/SodaCommand.h"/>
       <FILE id="c60nFW" name="SodaGlobals.h" compile="0" resource="0" file="Source/SodaGlobals.h"/>
       <FILE id="nr6K1V" name="SodaGlobals.cpp" compile="1" resource="0" file="Source/SodaGlobals.cpp"/>
       <FILE id="CW3eE8" name="SodaToolbox.cpp" compile="1" resource="0" file="Source/SodaToolbox.cpp"/>

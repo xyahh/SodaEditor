@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SodaGlobals.h"
+#include "SodaCommand.h"
 #include "SodaLayer.h"
 #include <deque>
 #include <stack>

@@ -25,6 +25,7 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 #include "SodaGlobals.h"
+#include "SodaBrush.h"
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -93,9 +94,6 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
 
 		InitStyleButtons(freeStyle.get());
 		InitStyleButtons(circleStyle.get());
-
-		freeStyle->setToggleState(true, dontSendNotification);
-		gCurrentProperties.currentBrush = ESodaShapes::FreeStyle;
 	}
 
 
@@ -105,10 +103,13 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
 
 
     //[Constructor] You can add your own custom stuff here..
-
+	//init currentBrush as the FreeStyle
+	gProperties.brush = &FreeStyleBrush;
+	//set FreeStyle as Current Brush
+	freeStyle->setToggleState(true, dontSendNotification);
 	//Set as Default starting Colour
-	gCurrentProperties.brushColour = Colours::black;
-	gCurrentProperties.brushSize = 1;
+	gProperties.brushColour = Colours::black;
+	gProperties.brushSize = 1;
     //[/Constructor]
 }
 
@@ -197,13 +198,13 @@ void SodaProperties::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == freeStyle.get())
     {
         //[UserButtonCode_freeStyle] -- add your button handler code here..
-		gCurrentProperties.currentBrush = ESodaShapes::FreeStyle;
+		gProperties.brush = &FreeStyleBrush;
         //[/UserButtonCode_freeStyle]
     }
     else if (buttonThatWasClicked == circleStyle.get())
     {
         //[UserButtonCode_circleStyle] -- add your button handler code here..
-		gCurrentProperties.currentBrush = ESodaShapes::Circle;
+		gProperties.brush = &CircleBrush;
         //[/UserButtonCode_circleStyle]
     }
 
@@ -219,7 +220,7 @@ void SodaProperties::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == brushSlider.get())
     {
         //[UserSliderCode_brushSlider] -- add your slider handling code here..
-		gCurrentProperties.brushSize = static_cast<int>(brushSlider->getValue());
+		gProperties.brushSize = static_cast<int>(brushSlider->getValue());
         //[/UserSliderCode_brushSlider]
     }
 
@@ -239,7 +240,7 @@ void SodaProperties::changeListenerCallback(ChangeBroadcaster * source)
 	{
 		Colour colour = cs->getCurrentColour();
 		paletteButton->setColour(TextButton::buttonColourId, colour);
-		gCurrentProperties.brushColour = colour;
+		gProperties.brushColour = colour;
 	}
 }
 

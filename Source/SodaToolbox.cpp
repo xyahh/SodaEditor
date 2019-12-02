@@ -77,10 +77,10 @@ void SodaToolbox::paint (Graphics& g)
     //[UserPaint] Add your own custom painting code here..
 
 	//draw if there's an image available
-	if (gCurrentProperties.currentImage)
+	if (gProperties.image)
 	{
 		g.setImageResamplingQuality(Graphics::ResamplingQuality::lowResamplingQuality);
-		g.drawImage(*gCurrentProperties.currentImage, previewRectangle, RectanglePlacement::centred);
+		g.drawImage(*gProperties.image, previewRectangle, RectanglePlacement::centred);
 	}
 
 
