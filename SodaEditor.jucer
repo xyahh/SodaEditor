@@ -7,8 +7,15 @@
       <FILE id="TJ9i2X" name="SodaBrush.h" compile="0" resource="0" file="Source/SodaBrush.h"/>
       <FILE id="kuvG7e" name="SodaCircleBrush.cpp" compile="1" resource="0"
             file="Source/SodaCircleBrush.cpp"/>
+      <FILE id="mgjUqd" name="SodaEraserBrush.cpp" compile="1" resource="0"
+            file="Source/SodaEraserBrush.cpp"/>
       <FILE id="qRyljO" name="SodaFreeStyleBrush.cpp" compile="1" resource="0"
             file="Source/SodaFreeStyleBrush.cpp"/>
+      <FILE id="EyUTcM" name="SodaLineBrush.cpp" compile="1" resource="0"
+            file="Source/SodaLineBrush.cpp"/>
+      <FILE id="o1kVmZ" name="SodaRectBrush.cpp" compile="1" resource="0"
+            file="Source/SodaRectBrush.cpp"/>
+      <FILE id="unY72A" name="SodaRectBrush.h" compile="0" resource="0" file="Source/SodaRectBrush.h"/>
     </GROUP>
     <GROUP id="{34957632-4911-CD7F-553F-2DCA72E199A9}" name="Soda">
       <FILE id="XKSRmF" name="SodaCommand.cpp" compile="1" resource="0" file="Source/SodaCommand.cpp"/>
