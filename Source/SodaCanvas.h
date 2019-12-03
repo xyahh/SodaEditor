@@ -69,7 +69,7 @@ public:
 	/*
 	@ Swaps a Subject/Target layer with another Layer
 	*/
-	bool swapLayers(size_t targetLayer, size_t otherLayer);
+	bool moveLayer(size_t targetLayerId, size_t destinationLayerId, bool placeBeforeDestinationLayer);
 
 	/*
 	@ Adds settings to the Playback
@@ -160,6 +160,13 @@ public:
 	returns true if operation was successful
 	*/
 	bool setActiveLayer_Internal(size_t id);
+
+	/*
+	Internal func that moves a layer to a destination in the deque.
+	placeBeforeDestination specifies whether to place the target layer to the left of/before destination layer (true)
+	or to the right of /after destination layer (false)
+	*/
+	bool moveLayer_Internal(size_t target, size_t destination, bool placeBeforeDestination);
 
 	/* Saves the Canvas to file
 	@param filename: The destination of the image(s). if it's more

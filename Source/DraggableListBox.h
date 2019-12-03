@@ -34,9 +34,6 @@ struct DraggableListBoxItemData
 	virtual int getNumItems() = 0;
 	virtual void paintContents(int, Graphics&, Rectangle<int>) = 0;
 
-	virtual void moveBefore(int indexOfItemToMove, int indexOfItemToPlaceBefore) = 0;
-	virtual void moveAfter(int indexOfItemToMove, int indexOfItemToPlaceAfter) = 0;
-
 	// If you need a dynamic list, override these functions as well.
 	virtual void deleteItem(int /*indexOfItemToDelete*/) {};
 	virtual void addItemAtEnd() {};
@@ -44,12 +41,12 @@ struct DraggableListBoxItemData
 
 // DraggableListBox is basically just a ListBox, that inherits from DragAndDropContainer.
 // Declare your list box using this type.
-class DraggableListBox : public ListBox, public DragAndDropContainer
+class DraggableListBox : public ListBox
 {
 };
 
 // Everything below this point should be generic.
-class DraggableListBoxItem : public Component, public DragAndDropTarget
+class DraggableListBoxItem : public Component
 {
 public:
 	DraggableListBoxItem(DraggableListBox& lb, DraggableListBoxItemData& data, int rn)
@@ -57,30 +54,12 @@ public:
 
 	// Component
 	void paint(Graphics& g) override;
-	void mouseEnter(const MouseEvent&) override;
-	void mouseExit(const MouseEvent&) override;
-	void mouseDrag(const MouseEvent&) override;
 
-	// DragAndDropTarget
-	bool isInterestedInDragSource(const SourceDetails&) override { return true; }
-	void itemDragEnter(const SourceDetails&) override;
-	void itemDragMove(const SourceDetails&) override;
-	void itemDragExit(const SourceDetails&) override;
-	void itemDropped(const SourceDetails&) override;
-	bool shouldDrawDragImageWhenOver() override { return true; }
-
-	// DraggableListBoxItem
 protected:
-	void updateInsertLines(const SourceDetails &dragSourceDetails);
-	void hideInsertLines();
 
 	int rowNum;
 	DraggableListBoxItemData& modelData;
 	DraggableListBox& listBox;
-
-	MouseCursor savedCursor;
-	bool insertAfter = false;
-	bool insertBefore = false;
 };
 
 class DraggableListBoxModel : public ListBoxModel

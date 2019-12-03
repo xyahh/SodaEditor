@@ -136,3 +136,23 @@ private:
 	//check whether its first time we do this
 	bool prevIDset;
 };
+
+
+/*
+Moves a target layer in the Deque  to a position before or after the Destination ID layer.
+*/
+class FSodaMoveLayerCommand : public FSodaCommand
+{
+public:
+	FSodaMoveLayerCommand(size_t target_, size_t destination_, bool placeBeforeDestination_) :
+		target(target_), destination(destination_), placeBeforeDestination(placeBeforeDestination_) {}
+
+	virtual bool execute(SodaCanvas* canvas);
+	virtual bool undo(SodaCanvas* canvas);
+
+private:
+
+	size_t target;
+	size_t destination;
+	bool placeBeforeDestination;
+};

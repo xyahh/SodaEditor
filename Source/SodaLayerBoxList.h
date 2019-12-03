@@ -1,40 +1,11 @@
-/*
-  ==============================================================================
-
-	Based on the Example given at: https://github.com/getdunne/juce-draggableListBox
-	Copyright below:
-
-		MIT License
-		
-		Copyright (c) 2019 Shane Dunne
-		
-		Permission is hereby granted, free of charge, to any person obtaining a copy
-		of this software and associated documentation files (the "Software"), to deal
-		in the Software without restriction, including without limitation the rights
-		to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-		copies of the Software, and to permit persons to whom the Software is
-		furnished to do so, subject to the following conditions:
-		
-		The above copyright notice and this permission notice shall be included in all
-		copies or substantial portions of the Software.
-		
-		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-		IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-		FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-		AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-		LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-		OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-		SOFTWARE.
-
-  ==============================================================================
-*/
+//custom layer list 
 
 #pragma once
-#include "DraggableListBox.h"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 class SodaCanvas;
 
-struct LayerListBoxItemData : public DraggableListBoxItemData
+struct LayerListBoxItemData
 {
 	struct FLayerInfo
 	{
@@ -53,24 +24,20 @@ struct LayerListBoxItemData : public DraggableListBoxItemData
 	//returns the amount of layernames there are 
 	virtual int getNumItems();
 
-	//we'll paint the contents in reverse, so that the top layer is 
-	// also the layer at the top of the list
 	virtual void paintContents(int rowNum, Graphics& g, Rectangle<int> bounds);
 
-	virtual void moveBefore(int indexOfItemToMove, int indexOfItemToPlaceBefore);
-	virtual void moveAfter(int indexOfItemToMove, int indexOfItemToPlaceAfter);
-
-	// If you need a dynamic list, override these functions as well.
 	virtual void deleteItem(int indexOfItemToDelete);
-
-	virtual void addItemAtEnd();
 };
 
-// Custom list-item Component (which includes item-delete button)
-class LayerListComponent : public DraggableListBoxItem
+class LayerListBox : public ListBox
+{
+};
+
+
+class LayerListComponent : public Component
 {
 public:
-	LayerListComponent(DraggableListBox& lb, LayerListBoxItemData& data, int rn, SodaCanvas* sodaCanvas);
+	LayerListComponent(LayerListBox& lb, LayerListBoxItemData& data, int rn, SodaCanvas* sodaCanvas);
 	virtual ~LayerListComponent();
 
 	void paint(Graphics&) override;
@@ -85,7 +52,9 @@ protected:
 	TextButton deleteLayerButton;
 
 	//pointer to the model data found in the parent. to avoid having to always do dynamic cast 
-	LayerListBoxItemData* layerData;
+	LayerListBoxItemData& layerData;
+	LayerListBox& listBox;
+	int rowNum;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LayerListComponent)
@@ -93,16 +62,25 @@ private:
 
 // Customized DraggableListBoxModel overrides refreshComponentForRow() to ensure that every
 // list-item Component is a MyListComponent.
-class LayerListBoxModel : public DraggableListBoxModel
+class LayerListBoxModel : public ListBoxModel
 {
 public:
-	LayerListBoxModel(DraggableListBox& lb, DraggableListBoxItemData& md)
-		: DraggableListBoxModel(lb, md) {}
+	LayerListBoxModel(LayerListBox& lb, LayerListBoxItemData& md)
+		: listBox(lb), layerData(md) {}
 
 	void setCanvas(SodaCanvas* sodaCanvas_);
 
+	int getNumRows() override;
+	void paintListBoxItem(int, Graphics &, int, int, bool) override;
 	Component* refreshComponentForRow(int, bool, Component*) override;
 
 private:
 	SodaCanvas* sodaCanvas;
+
+	// Draggable model has a reference to its owner ListBox, so it can tell it to update after DnD.
+	LayerListBox &listBox;
+
+	// It also has a reference to the model data, which it uses to get the current items count,
+	// and which it passes to the DraggableListBoxItem objects it creates/updates.
+	LayerListBoxItemData& layerData;
 };

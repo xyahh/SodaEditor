@@ -269,9 +269,11 @@ bool SodaCanvas::setActiveLayer(size_t id)
 	return registerNewCommand(pCommand, true);
 }
 
-bool SodaCanvas::swapLayers(size_t targetLayerID, size_t otherLayerID)
+bool SodaCanvas::moveLayer(size_t targetLayerId, size_t destinationLayerId, bool placeBeforeDestinationLayer)
 {
-	return true;
+	FSodaMoveLayerCommand* pCommand;
+	pCommand = new FSodaMoveLayerCommand(targetLayerId, destinationLayerId, placeBeforeDestinationLayer);
+	return registerNewCommand(pCommand, true);
 }
 
 void SodaCanvas::addPlaybackSettings(int Settings)
@@ -515,6 +517,52 @@ bool SodaCanvas::setActiveLayer_Internal(size_t id)
 	size_t index;
 	if (false == findLayerIndex(id, &index)) return false;
 	return setActiveLayerIndex_Internal(index);
+}
+
+bool SodaCanvas::moveLayer_Internal(size_t target, size_t destination, bool isBeforeDestination)
+{
+	size_t targetIndex;
+	size_t destinationIndex;
+
+	//check that both Indices are found in the map
+	if (false == findLayerIndex(target, &targetIndex) ||
+		false == findLayerIndex(destination, &destinationIndex)) 
+			return false;
+
+	//check if any of the indices are out of range
+	if (targetIndex < 0 || targetIndex >= layers.size()) 
+		return false;
+	if (destinationIndex < 0 || destinationIndex >= layers.size()) 
+		return false;
+
+	//if same, we don't move. 
+	if (targetIndex == destinationIndex)
+		return true;
+
+	SodaLayer* pTargetLayer = layers[targetIndex];
+
+	//in the case that target is further down the deque, we have to move the elements on the left (front)
+	if (targetIndex > destinationIndex)
+	{
+		//limitIndex: if isBeforeDest means we place the target more to the left so we have to move
+		// destination layer as well. else, we are placing it right after destination layer so we just start moving from
+		//destinationIndex + 1
+		size_t limitIndex = (isBeforeDestination) ? destinationIndex : destinationIndex + 1;
+		for (int i = targetIndex; i > limitIndex; --i)
+			layers[i] = layers[i - 1];
+		layers[limitIndex] = pTargetLayer;
+	}
+	//else, we move the elements on the right (back)
+	else
+	{
+		//limitIndex: if isBeforeDest means we place the target more to the left so we ** DONT** have to move
+		// destination layer in this case. else, we are placing it right after destination layer so 
+		//we move all the items including destination layer
+		size_t limitIndex = (isBeforeDestination) ? destinationIndex - 1 : destinationIndex;
+		for (int i = targetIndex; i < limitIndex; ++i)
+			layers[i] = layers[i + 1];
+		layers[limitIndex] = pTargetLayer;
+	}
 }
 
 void SodaCanvas::saveCanvasToFile(const String & filename, bool layerPerFile)

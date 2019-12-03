@@ -67,9 +67,9 @@ private:
 
 	Rectangle<float> previewRectangle;
 
-	LayerListBoxItemData itemData;
-	LayerListBoxModel listBoxModel;
-	DraggableListBox  listBox;
+	LayerListBoxItemData	itemData;
+	LayerListBoxModel		listBoxModel;
+	LayerListBox			listBox;
 
     //[/UserVariables]
 

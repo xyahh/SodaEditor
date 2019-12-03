@@ -50,30 +50,9 @@ void LayerListBoxItemData::paintContents(int rowNum, Graphics & g, Rectangle<int
 	g.drawText(layerInfo[rowNum]->layerName, bounds, Justification::centred);
 }
 
-void LayerListBoxItemData::moveBefore(int indexOfItemToMove, int indexOfItemToPlaceBefore)
-{
-	if (indexOfItemToMove <= indexOfItemToPlaceBefore)
-		layerInfo.move(indexOfItemToMove, indexOfItemToPlaceBefore - 1);
-	else
-		layerInfo.move(indexOfItemToMove, indexOfItemToPlaceBefore);
-}
-
-void LayerListBoxItemData::moveAfter(int indexOfItemToMove, int indexOfItemToPlaceAfter)
-{
-	if (indexOfItemToMove <= indexOfItemToPlaceAfter)
-		layerInfo.move(indexOfItemToMove, indexOfItemToPlaceAfter);
-	else
-		layerInfo.move(indexOfItemToMove, indexOfItemToPlaceAfter + 1);
-}
-
 void LayerListBoxItemData::deleteItem(int indexOfItemToDelete)
 {
 	layerInfo.remove(indexOfItemToDelete);
-}
-
-void LayerListBoxItemData::addItemAtEnd()
-{
-	layerInfo.add(new FLayerInfo("", false));
 }
 
 /*
@@ -82,30 +61,25 @@ LIST COMPONENT
 ==============================================================================
 */
 
-LayerListComponent::LayerListComponent(DraggableListBox& lb, LayerListBoxItemData& data, int rn, SodaCanvas* sodaCanvas_)
-	: DraggableListBoxItem(lb, data, rn)
+LayerListComponent::LayerListComponent(LayerListBox& lb, LayerListBoxItemData& data, int rn, SodaCanvas* sodaCanvas_)
+	: listBox(lb), layerData(data), rowNum(rn)
 {
+	//set the canvas
 	sodaCanvas = sodaCanvas_;
-	//cast to what we actually have, the LayerListBox
-	layerData = dynamic_cast<LayerListBoxItemData*>(&modelData);	
 
-	////set current item to active
-	//if (layerData)
-	//	sodaCanvas->setActiveLayer(layerData->layerInfo[rowNum]->layerID);
-
+	//make the activate button & bind its click to the canvas activate layer func
 	activateLayerButton.setButtonText("Activate");
 	activateLayerButton.onClick = [this]()
 	{
-		if(layerData)
-			sodaCanvas->setActiveLayer(layerData->layerInfo[rowNum]->layerID);
+		sodaCanvas->setActiveLayer(layerData.layerInfo[rowNum]->layerID);
 	};
 	addAndMakeVisible(activateLayerButton);
 
+	//make the delete button & bind its click to the canvas delete layer func
 	deleteLayerButton.setButtonText("X");
 	deleteLayerButton.onClick = [this]()
 	{
-		if(layerData)
-			sodaCanvas->deleteLayer(layerData->layerInfo[rowNum]->layerID);
+		sodaCanvas->deleteLayer(layerData.layerInfo[rowNum]->layerID);
 	};
 	addAndMakeVisible(deleteLayerButton);
 
@@ -119,14 +93,15 @@ LayerListComponent::~LayerListComponent()
 
 void LayerListComponent::paint(Graphics& g)
 {
-	auto& info = layerData->layerInfo;
-	if (info[rowNum] == nullptr) return;
+	auto& info = layerData.layerInfo;
+	if (info[rowNum] == nullptr || sodaCanvas == nullptr) return;
 
-	if (layerData && sodaCanvas->isActiveLayer(info[rowNum]->layerID))
+	if (sodaCanvas->isActiveLayer(info[rowNum]->layerID))
 		g.fillAll(Colours::lightsalmon);
 	else 
 		g.fillAll(Colours::lightgrey);	
-	DraggableListBoxItem::paint(g);
+
+	layerData.paintContents(rowNum, g, getLocalBounds());
 }
 
 void LayerListComponent::resized()
@@ -135,7 +110,6 @@ void LayerListComponent::resized()
 	activateLayerButton.setBounds(dataArea.removeFromLeft(90).withSizeKeepingCentre(75, 24));
 	deleteLayerButton.setBounds(dataArea.removeFromRight(70).withSizeKeepingCentre(30, 24));
 }
-
 
 /*
 ==============================================================================
@@ -148,14 +122,23 @@ void LayerListBoxModel::setCanvas(SodaCanvas * sodaCanvas_)
 	sodaCanvas = sodaCanvas_;
 }
 
+int LayerListBoxModel::getNumRows()
+{
+	return layerData.getNumItems();
+}
+
+void LayerListBoxModel::paintListBoxItem(int, Graphics &, int, int, bool)
+{
+}
+
 Component* LayerListBoxModel::refreshComponentForRow(int rowNumber,
 	bool isRowSelected,
 	Component *existingComponentToUpdate)
 {
 	ScopedPointer<LayerListComponent> item(dynamic_cast<LayerListComponent*>(existingComponentToUpdate));
-	if (isPositiveAndBelow(rowNumber, modelData.getNumItems()))
+	if (isPositiveAndBelow(rowNumber, layerData.getNumItems()))
 	{
-		item = new LayerListComponent(listBox, (LayerListBoxItemData&)modelData, rowNumber, sodaCanvas);
+		item = new LayerListComponent(listBox, (LayerListBoxItemData&)layerData, rowNumber, sodaCanvas);
 	}
 	return item.release();
 }
