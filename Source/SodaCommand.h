@@ -134,7 +134,7 @@ private:
 class FSodaCreateLayerCommand : public FSodaCommand
 {
 public:
-	FSodaCreateLayerCommand() {}
+	FSodaCreateLayerCommand(size_t id_) : id(id_) {}
 
 	virtual bool execute(SodaCanvas* canvas);
 	virtual bool undo(SodaCanvas* canvas);
@@ -145,7 +145,7 @@ public:
 	}
 
 private:
-	size_t Index;
+	size_t id;
 };
 
 /*
@@ -156,7 +156,7 @@ class FSodaDeleteLayerCommand : public FSodaCommand
 {
 public:
 
-	FSodaDeleteLayerCommand(size_t Index_) : Index(Index_) {}
+	FSodaDeleteLayerCommand(size_t id_) : id(id_) {}
 	virtual ~FSodaDeleteLayerCommand() {}
 
 	virtual bool execute(SodaCanvas* canvas);
@@ -168,6 +168,6 @@ public:
 	}
 
 private:
-	size_t Index;
+	size_t id;
 	Image  image;
 };

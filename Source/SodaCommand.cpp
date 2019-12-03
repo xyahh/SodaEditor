@@ -44,15 +44,13 @@ Create Layer Command
 bool FSodaCreateLayerCommand::execute(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	Index = canvas->createLayer();
-	return true;
+	return canvas->createLayer(id);
 }
 
 bool FSodaCreateLayerCommand::undo(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	canvas->deleteLayer(Index);
-	return true;
+	return canvas->deleteLayer(id);
 }
 
 
@@ -66,12 +64,11 @@ bool FSodaDeleteLayerCommand::execute(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
 	SodaLayer* pLayer;
-	if (canvas->getLayer(Index, &pLayer))
+	if (canvas->getLayer(id, &pLayer))
 	{
 		//save a copy of the image before deleting so that we can restore if we undo
 		image = pLayer->getLayerImage()->createCopy();
-		canvas->deleteLayer(Index);
-		return true;
+		return canvas->deleteLayer(id);
 	}
 	return false;
 }
@@ -80,8 +77,9 @@ bool FSodaDeleteLayerCommand::undo(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
 	SodaLayer* pLayer;
-	Index = canvas->createLayer();
-	if (canvas->getLayer(Index, &pLayer))
+	if (!canvas->createLayer(id))
+		return false;
+	if (canvas->getLayer(id, &pLayer))
 	{
 		//restore the image 
 		(*pLayer->getLayerImage()) = image.createCopy();

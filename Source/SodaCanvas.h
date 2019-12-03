@@ -24,6 +24,7 @@
 #include "SodaGlobals.h"
 #include "SodaCommand.h"
 #include "SodaLayer.h"
+#include "Delegate.h"
 #include <deque>
 #include <stack>
 //[/Headers]
@@ -51,9 +52,11 @@ public:
 
 	/*
 	@ Creates a Layer and sets it as Active.
+	@ it creates a map between the ID specified and the index the layer is at.
 	@ it also pushes the layer creation command into the undo stack.
+	@ returns true if the operations were successful or false if the ID already exists in the map
 	*/
-	size_t createLayer();
+	bool createLayer(size_t id);
 
 	/*
 	@ Deletes the designated layer. If it was the active layer, the program will look
@@ -61,12 +64,12 @@ public:
 	@ It also pushes the layer deletion command, which contains a copy of what was deleted, into
 	the undo stack.
 	*/
-	void deleteLayer(size_t index);
+	bool deleteLayer(size_t id);
 
 	/*
 	@ Swaps a Subject/Target layer with another Layer
 	*/
-	void swapLayers(size_t targetLayer, size_t otherLayer);
+	bool swapLayers(size_t targetLayer, size_t otherLayer);
 
 	/*
 	@ Adds settings to the Playback
@@ -89,14 +92,28 @@ public:
 
 	/* Sets Active Layer by first Deactivating the Currently active one and then
 	activating the new one
-	@ returns true if the index was in range & was activated. false if out of range
+	@ returns true if the id was found and the index mapped was in range & was activated. false if out of range or id not found
 	*/
-	bool setActiveLayer(size_t index);
+	bool setActiveLayer(size_t id);
 
 	/* Gets the Current Active Layer
-	@ returns true if the index was in range and is a valid active layer. false if out of range
+	@ returns true if the id was found and the index mapped was in range & was activated. false if out of range or id not found
 	*/
-	bool getActiveLayer(size_t* outIndex) const;
+	bool getActiveLayer(size_t* id) const;
+
+	/*
+	checks whether a given id is the active layer
+	@ true if the id is the active layer
+	@ false otherwise
+	*/
+	bool isActiveLayer(size_t id) const;
+
+	/*
+	Tries to find the index mapped to the layer id.
+	if found, will return true and will fill the data
+	if not found, will return false.
+	*/
+	bool findLayerIndex(size_t id, size_t* outIndex) const;
 
 	/*
 	Gets current Active Layer as a pointer
@@ -139,15 +156,38 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+	
+public:
 
 	/*
-	A list of Layers drawn in order.
+	@ Delegate that fires when a Layer has been created.
+	@ @param 1 size_t: the Layer ID of the layer created.
+	*/
+	FDelegate<size_t> OnLayerCreated;
+
+	/*
+	@ Delegate that fires when a Layer has been destroyed.
+	@ @param 1 size_t: the Layer ID of the layer destroyed.
+	*/
+	FDelegate<size_t> OnLayerDestroyed;
+
+private:
+
+	/*
+	A deque of Layers drawn in order.
 	Layers are drawn from Begin to End
 	i.e. a layer with a higher index will be drawn over
 	a layer with lower index
 	*/
 	std::deque<SodaLayer> layers;
 
+	/*
+	A map that maps one given ID to the actual index
+	of that ID in the layer deque. This is to manage the
+	movement of the layers from within the canvas and not invalidate/update
+	the indices/ids of layers from other components
+	*/
+	std::map<size_t, size_t> layerIDmap;
 
 	/*
 	Indicator of the Index of the currently Active Layer.

@@ -37,9 +37,9 @@ SodaPlayer::SodaPlayer (SodaCanvas* canvas_)
     playButton->addListener (this);
 
     playButton->setImages (false, true, true,
-                           ImageCache::getFromMemory (playIcon_png2, playIcon_png2Size), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0xff383838),
-                           Image(), 1.000f, Colour (0xff373737));
+                           ImageCache::getFromMemory (playIcon_png2, playIcon_png2Size), 1.000f, Colour (0xff373737),
+                           Image(), 1.000f, Colour (0xff999999),
+                           Image(), 1.000f, Colours::white);
     reverseButton.reset (new ImageButton ("reverseButton"));
     addAndMakeVisible (reverseButton.get());
     reverseButton->addListener (this);
@@ -53,16 +53,22 @@ SodaPlayer::SodaPlayer (SodaCanvas* canvas_)
     pauseButton->addListener (this);
 
     pauseButton->setImages (false, true, true,
-                            ImageCache::getFromMemory (pauseIcon_png, pauseIcon_pngSize), 1.000f, Colour (0x00000000),
-                            Image(), 1.000f, Colour (0xff383838),
-                            Image(), 1.000f, Colour (0xff373737));
+                            ImageCache::getFromMemory (pauseIcon_png, pauseIcon_pngSize), 1.000f, Colour (0xff373737),
+                            Image(), 1.000f, Colour (0xff999999),
+                            Image(), 1.000f, Colours::white);
 
     //[UserPreSize]
 	sodaCanvas = canvas_;
 	isReversed = false;
 
 	pauseButton->setRadioGroupId(2345);
+	pauseButton->setClickingTogglesState(true);
 	playButton->setRadioGroupId(2345);
+	playButton->setClickingTogglesState(true);
+	reverseButton->setClickingTogglesState(true);
+
+	pauseButton->setToggleState(true, NotificationType::dontSendNotification);
+	//playButton->setToggleState(false, NotificationType::dontSendNotification);
 
     //[/UserPreSize]
 
@@ -104,9 +110,9 @@ void SodaPlayer::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    playButton->setBounds ((getWidth() / 2) + -80 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.8000f) / 2), 80, proportionOfHeight (0.8000f));
-    reverseButton->setBounds (getWidth() - 30 - 120, (getHeight() / 2) - (proportionOfHeight (0.8000f) / 2), 120, proportionOfHeight (0.8000f));
-    pauseButton->setBounds ((getWidth() / 2) + 80 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.8000f) / 2), 80, proportionOfHeight (0.8000f));
+    playButton->setBounds ((getWidth() / 2) + -60 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.7997f) / 2), 80, proportionOfHeight (0.7997f));
+    reverseButton->setBounds (getWidth() - 30 - 120, (getHeight() / 2) - (proportionOfHeight (0.7997f) / 2), 120, proportionOfHeight (0.7997f));
+    pauseButton->setBounds ((getWidth() / 2) + 60 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.7997f) / 2), 80, proportionOfHeight (0.7997f));
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -126,9 +132,9 @@ void SodaPlayer::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_reverseButton] -- add your button handler code here..
 		if(isReversed)
-			sodaCanvas->addPlaybackSettings(ESodaPlayback::Playback_Reversed);
-		else
 			sodaCanvas->removePlaybackSettings(ESodaPlayback::Playback_Reversed);
+		else
+			sodaCanvas->addPlaybackSettings(ESodaPlayback::Playback_Reversed);
 		isReversed = !isReversed;
         //[/UserButtonCode_reverseButton]
     }
@@ -164,23 +170,23 @@ BEGIN_JUCER_METADATA
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff808080"/>
   <IMAGEBUTTON name="playButton" id="4719442ecbdf6974" memberName="playButton"
-               virtualName="" explicitFocusOrder="0" pos="143Cc 0Cc 80 80%"
+               virtualName="" explicitFocusOrder="0" pos="-60Cc 0Cc 80 79.967%"
                buttonText="playButton" connectedEdges="0" needsCallback="1"
                radioGroupId="0" keepProportions="1" resourceNormal="playIcon_png2"
-               opacityNormal="1.0" colourNormal="0" resourceOver="" opacityOver="1.0"
-               colourOver="ff383838" resourceDown="" opacityDown="1.0" colourDown="ff373737"/>
+               opacityNormal="1.0" colourNormal="ff373737" resourceOver="" opacityOver="1.0"
+               colourOver="ff999999" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <IMAGEBUTTON name="reverseButton" id="7c50cee4f596381c" memberName="reverseButton"
-               virtualName="" explicitFocusOrder="0" pos="-417Rr 0Cc 120 80%"
+               virtualName="" explicitFocusOrder="0" pos="30Rr 0Cc 120 79.967%"
                buttonText="reverseButton" connectedEdges="0" needsCallback="1"
                radioGroupId="0" keepProportions="1" resourceNormal="reverseIcon_png"
                opacityNormal="1.0" colourNormal="ff373737" resourceOver="" opacityOver="1.0"
                colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <IMAGEBUTTON name="pauseButton" id="72de65e485a22132" memberName="pauseButton"
-               virtualName="" explicitFocusOrder="0" pos="303Cc 0Cc 80 80%"
+               virtualName="" explicitFocusOrder="0" pos="60Cc 0Cc 80 79.967%"
                buttonText="pauseButton" connectedEdges="0" needsCallback="1"
                radioGroupId="0" keepProportions="1" resourceNormal="pauseIcon_png"
-               opacityNormal="1.0" colourNormal="0" resourceOver="" opacityOver="1.0"
-               colourOver="ff383838" resourceDown="" opacityDown="1.0" colourDown="ff373737"/>
+               opacityNormal="1.0" colourNormal="ff373737" resourceOver="" opacityOver="1.0"
+               colourOver="ff999999" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

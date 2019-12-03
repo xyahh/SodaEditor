@@ -49,6 +49,7 @@ public:
 	void update() override;
 
 	void createLayer();
+	void layerCreated(size_t layer_id);
 
     //[/UserMethods]
 

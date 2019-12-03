@@ -210,18 +210,18 @@ void SodaProperties::resized()
     //[/UserPreResize]
 
     brushGroup->setBounds (0, 0, proportionOfWidth (1.0000f), 250);
-    canvasGroup->setBounds (0, 500, proportionOfWidth (1.0000f), getHeight() - 500);
-    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
+    canvasGroup->setBounds (0, 500, proportionOfWidth (1.0000f), getHeight() - 320);
+    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
     brushTypeGroup->setBounds (0, 250, proportionOfWidth (1.0000f), 250);
-    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 20, 150, 50);
-    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3000f), 25);
-    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3000f), 250 + 45, proportionOfWidth (0.3000f), 25);
-    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3000f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    label2->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (500 + 30) + 20, 150, 50);
-    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
-    pixelScaleSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 500 + 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
+    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 20, 150, 50);
+    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3002f), 25);
+    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3002f), 250 + 45, proportionOfWidth (0.3002f), 25);
+    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3002f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    label2->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -100 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2)) + -886, (500 + -500) + 0, 0, 0);
+    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
+    pixelScaleSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -100 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2), 500 + -500, roundToInt (proportionOfWidth (1.0000f) * 0.0000f), 0);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }

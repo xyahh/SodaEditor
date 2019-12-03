@@ -49,6 +49,8 @@
             file="Source/SodaProperties.h"/>
     </GROUP>
     <GROUP id="{9E82BCCB-4FD1-A99C-16A5-84A34BD7C9A1}" name="Source">
+      <FILE id="nwNxmn" name="Delegate.cpp" compile="1" resource="0" file="Source/Delegate.cpp"/>
+      <FILE id="h3kBQC" name="Delegate.h" compile="0" resource="0" file="Source/Delegate.h"/>
       <FILE id="IQaKW1" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
   </MAINGROUP>

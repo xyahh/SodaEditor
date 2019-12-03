@@ -39,16 +39,13 @@ struct LayerListBoxItemData : public DraggableListBoxItemData
 	struct FLayerInfo
 	{
 		FLayerInfo(const String& name, bool isActive_)
-			: layerName(name)
-			, isActive(isActive_) {}
+			: layerName(name) {}
 
 		FLayerInfo(String&& name, bool isActive_) noexcept
-			: layerName(std::move(name))
-			, isActive(isActive_) {}
+			: layerName(std::move(name)){}
 
 		String layerName;
-		size_t layerIndex;
-		bool	isActive;
+		size_t layerID;
 	};
 
 	OwnedArray<FLayerInfo> layerInfo;
@@ -74,16 +71,19 @@ class LayerListComponent : public DraggableListBoxItem
 {
 public:
 	LayerListComponent(DraggableListBox& lb, LayerListBoxItemData& data, int rn, SodaCanvas* sodaCanvas);
-	virtual ~LayerListComponent() = default;
+	virtual ~LayerListComponent();
 
 	void paint(Graphics&) override;
 	void resized() override;
 
 protected:
 
+	size_t		onLayerDestroyedID;
+	SodaCanvas* sodaCanvas;
 	Rectangle<int> dataArea;
 	TextButton activateLayerButton;
 	TextButton deleteLayerButton;
+	LayerListBoxItemData* layerData;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LayerListComponent)

@@ -46,8 +46,8 @@ SodaCanvas::SodaCanvas ()
     //[Constructor] You can add your own custom stuff here..
 	//reset playback settings to 0
 	playbackSettings = 0;
-		//for now only have one layer at init time
-	createLayer();
+		//for now only have one layer at init time. layer id = 0
+	createLayer(0);
 
 	canvasUpdateFPS = 60;
 	setFramesPerSecond(canvasUpdateFPS);
@@ -228,24 +228,38 @@ void SodaCanvas::update()
 
 }
 
-size_t SodaCanvas::createLayer()
+bool SodaCanvas::createLayer(size_t id)
 {
+	size_t temp_index;
+	//if find returns true, we don't process further. The layer ID already exists.
+	if (findLayerIndex(id, &temp_index))
+		return false;
+
 	layers.emplace_back(resolution, resolution);
-	size_t Index = layers.size() - 1;
+	size_t index = layers.size() - 1;
+
+	layerIDmap.emplace(id, index);
+	setActiveLayer(id);
+
 	//set bounds so that we see the layer at the center
-	setActiveLayer(Index);
 	resizeLayer(layers.back());
 
-	registerNewCommand(new FSodaCreateLayerCommand, false);
-	return Index;
+	registerNewCommand(new FSodaCreateLayerCommand(id), false);
+
+	OnLayerCreated.Call(id);
+
+	return true;
 }
 
-void SodaCanvas::deleteLayer(size_t index)
+bool SodaCanvas::deleteLayer(size_t id)
 {
+	OnLayerDestroyed.Call(id);
+	return true;
 }
 
-void SodaCanvas::swapLayers(size_t targetLayer, size_t otherLayer)
+bool SodaCanvas::swapLayers(size_t targetLayerID, size_t otherLayerID)
 {
+	return true;
 }
 
 void SodaCanvas::addPlaybackSettings(int Settings)
@@ -263,8 +277,13 @@ void SodaCanvas::setPlaybackFPS(int FPS)
 	playbackFPS = FPS;
 }
 
-bool SodaCanvas::setActiveLayer(size_t index)
+bool SodaCanvas::setActiveLayer(size_t id)
 {
+
+	size_t index;
+	//find layer mapped
+	if (false == findLayerIndex(id, &index)) return false;
+
 	//don't do anything if its outside the range..
 	if (index < 0 || index >= layers.size()) return false;
 
@@ -281,20 +300,46 @@ bool SodaCanvas::setActiveLayer(size_t index)
 	return true;
 }
 
-bool SodaCanvas::getActiveLayer(size_t * outIndex) const
+bool SodaCanvas::getActiveLayer(size_t * outID) const
 {
-	//check if activeLayer is currently in range
-	if (activeLayer >= 0 && activeLayer < layers.size())
+	for (auto& i : layerIDmap)
 	{
-		//change the outindex to the active layer if valid and return true
-		*outIndex = activeLayer;
-		return true;
+		//check if the index mapped is the active layer
+		if (i.second == activeLayer)
+		{
+			//return the id;
+			*outID = i.first;
+			return true;
+		}
 	}
 	return false;
 }
 
-bool SodaCanvas::getLayer(size_t Index, SodaLayer** outLayer)
+bool SodaCanvas::isActiveLayer(size_t id) const
 {
+	size_t index;
+	if (false == findLayerIndex(id, &index))
+		return false;
+	return index == activeLayer;
+}
+
+bool SodaCanvas::findLayerIndex(size_t id, size_t * outIndex) const
+{
+	auto IterFinder = layerIDmap.find(id);
+	if (IterFinder == layerIDmap.end())
+		return false;
+
+	*outIndex = IterFinder->second;
+	return true;
+}
+
+bool SodaCanvas::getLayer(size_t id, SodaLayer** outLayer)
+{
+	size_t Index;
+
+	//find the index mapped to the id
+	if (false == findLayerIndex(id, &Index)) return false;
+
 	if (Index >= 0 && Index < layers.size())
 	{
 		//change the outindex to the active layer if valid and return true

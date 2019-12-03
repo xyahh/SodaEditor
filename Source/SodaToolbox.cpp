@@ -28,35 +28,56 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SodaToolbox::SodaToolbox (SodaCanvas* canvas_)
-    : listBoxModel(listBox, itemData)
+SodaToolbox::SodaToolbox(SodaCanvas* canvas_)
+	: listBoxModel(listBox, itemData)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
+	//[Constructor_pre] You can add your own custom stuff here..
+	//[/Constructor_pre]
 
-    imagePreview.reset (new GroupComponent ("imagePreview",
-                                            TRANS("Preview")));
-    addAndMakeVisible (imagePreview.get());
+	imagePreview.reset(new GroupComponent("imagePreview",
+		TRANS("Preview")));
+	addAndMakeVisible(imagePreview.get());
 
-    layerGroup.reset (new GroupComponent ("layerGroup",
-                                          TRANS("Layers")));
-    addAndMakeVisible (layerGroup.get());
+	layerGroup.reset(new GroupComponent("layerGroup",
+		TRANS("Layers")));
+	addAndMakeVisible(layerGroup.get());
 
-    createLayerButton.reset (new TextButton ("createLayerButton"));
-    addAndMakeVisible (createLayerButton.get());
-    createLayerButton->setButtonText (TRANS("Create Layer"));
-    createLayerButton->addListener (this);
-    createLayerButton->setColour (TextButton::buttonColourId, Colour (0x20ffffff));
+	createLayerButton.reset(new TextButton("createLayerButton"));
+	addAndMakeVisible(createLayerButton.get());
+	createLayerButton->setButtonText(TRANS("Create Layer"));
+	createLayerButton->addListener(this);
+	createLayerButton->setColour(TextButton::buttonColourId, Colour(0x20ffffff));
 
 
-    //[UserPreSize]
+	//[UserPreSize]
 
 	sodaCanvas = canvas_;
+	sodaCanvas->OnLayerCreated.Bind([&](size_t id) {
+		layerCreated(id);
+	});
+	sodaCanvas->OnLayerDestroyed.Bind([&](size_t id)
+	{
+		//we must have at least 2 layers to delete!
+		//there must be at least one layer present!
+		if (itemData.layerInfo.size() > 1)
+		{
+			for (size_t i = 0; i < itemData.layerInfo.size(); ++i)
+			{
+				if (itemData.layerInfo[i]->layerID == id)
+				{
+					itemData.layerInfo.remove(i, true);
+					break;
+				}
+			}
+			listBox.updateContent();
+		}
+	});
+
 	listBoxModel.setCanvas(sodaCanvas);
 
 	//default item
 	auto item = new LayerListBoxItemData::FLayerInfo("Layer #0", true);
-	item->layerIndex = 0;
+	item->layerID = 0;
 
 	itemData.layerInfo.add(item);
 	listBox.updateContent();
@@ -155,9 +176,14 @@ void SodaToolbox::update()
 
 void SodaToolbox::createLayer()
 {
-	static long long i = 1;
-	auto item = new LayerListBoxItemData::FLayerInfo(String("Layer #") + String(i++), true);
-	item->layerIndex = sodaCanvas->createLayer();
+	static long long layer_id = 1;
+	if(false == sodaCanvas->createLayer(layer_id++));
+}
+
+void SodaToolbox::layerCreated(size_t layer_id)
+{
+	auto item = new LayerListBoxItemData::FLayerInfo(String("Layer #") + String(layer_id), true);
+	item->layerID = layer_id;
 	itemData.layerInfo.add(item);
 	listBox.updateContent();
 }

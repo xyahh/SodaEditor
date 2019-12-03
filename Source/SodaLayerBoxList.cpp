@@ -45,7 +45,6 @@ int LayerListBoxItemData::getNumItems()
 
 void LayerListBoxItemData::paintContents(int rowNum, Graphics & g, Rectangle<int> bounds)
 {
-	g.fillAll(Colours::lightgrey);
 	g.setColour(Colours::black);
 	g.drawRect(bounds);
 	g.drawText(layerInfo[rowNum]->layerName, bounds, Justification::centred);
@@ -83,44 +82,47 @@ LIST COMPONENT
 ==============================================================================
 */
 
-LayerListComponent::LayerListComponent(DraggableListBox& lb, LayerListBoxItemData& data, int rn, SodaCanvas* sodaCanvas)
+LayerListComponent::LayerListComponent(DraggableListBox& lb, LayerListBoxItemData& data, int rn, SodaCanvas* sodaCanvas_)
 	: DraggableListBoxItem(lb, data, rn)
 {
+	sodaCanvas = sodaCanvas_;
+	//cast to what we actually have, the LayerListBox
+	layerData = dynamic_cast<LayerListBoxItemData*>(&modelData);	
+
+	//set current item to active
+	if (layerData)
+		sodaCanvas->setActiveLayer(layerData->layerInfo[rowNum]->layerID);
+
 	activateLayerButton.setButtonText("Activate");
-	activateLayerButton.onClick = [this, sodaCanvas]()
+	activateLayerButton.onClick = [this]()
 	{
-		//cast to what we actually have, the LayerListBox
-		if (LayerListBoxItemData* pData = dynamic_cast<LayerListBoxItemData*>(&modelData))
-		{
-			//set all layers to inactive
-			for (auto& i : pData->layerInfo)
-				i->isActive = false;
-			//only the clicked layer will be active
-			pData->layerInfo[rowNum]->isActive = true;
-			//call canvas
-			sodaCanvas->setActiveLayer(pData->layerInfo[rowNum]->layerIndex);
-		}
+		if(layerData)
+			sodaCanvas->setActiveLayer(layerData->layerInfo[rowNum]->layerID);
 	};
 	addAndMakeVisible(activateLayerButton);
 
 	deleteLayerButton.setButtonText("X");
-	deleteLayerButton.onClick = [this, sodaCanvas]()
+	deleteLayerButton.onClick = [this]()
 	{
-		if(LayerListBoxItemData* pData = dynamic_cast<LayerListBoxItemData*>(&modelData))
-			sodaCanvas->deleteLayer(pData->layerInfo[rowNum]->layerIndex);
-		if (modelData.getNumItems() > 1)
-		{
-			modelData.deleteItem(rowNum);
-			listBox.updateContent();
-		}
-		//update Canvas
+		if(layerData)
+			sodaCanvas->deleteLayer(layerData->layerInfo[rowNum]->layerID);
 	};
 	addAndMakeVisible(deleteLayerButton);
+
+	
+}
+
+LayerListComponent::~LayerListComponent()
+{
+	
 }
 
 void LayerListComponent::paint(Graphics& g)
 {
-	modelData.paintContents(rowNum, g, dataArea);
+	if (layerData && sodaCanvas->isActiveLayer(layerData->layerInfo[rowNum]->layerID))
+		g.fillAll(Colours::lightsalmon);
+	else 
+		g.fillAll(Colours::lightgrey);	
 	DraggableListBoxItem::paint(g);
 }
 
@@ -130,6 +132,7 @@ void LayerListComponent::resized()
 	activateLayerButton.setBounds(dataArea.removeFromLeft(90).withSizeKeepingCentre(75, 24));
 	deleteLayerButton.setBounds(dataArea.removeFromRight(70).withSizeKeepingCentre(30, 24));
 }
+
 
 /*
 ==============================================================================
