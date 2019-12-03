@@ -68,73 +68,37 @@ class FSodaDrawCommand : public FSodaCommand
 {
 public:
 
-	FSodaDrawCommand(Image* imageToDrawOn, std::set<FPixel>&& Pixels_)
-		: image(imageToDrawOn)
+	FSodaDrawCommand(size_t layer_id_, std::set<FPixel>&& Pixels_)
+		: layer_id(layer_id_)
 		, Pixels(std::move(Pixels_))
 	{
 	}
 
-	virtual bool execute(SodaCanvas* canvas)
-	{
-		if (!image) return false;
-		//set the new color of the pixel
-		for (auto& pixel : Pixels)
-			image->setPixelAt(pixel.x, pixel.y, pixel.newColour);
-		return true;
-	}
+	virtual bool execute(SodaCanvas* canvas);
 
-	virtual bool undo(SodaCanvas* canvas)
-	{
-		if (!image) return false;
-		//set the colour of the pixel to the previous color
-		for (auto& pixel : Pixels)
-			image->setPixelAt(pixel.x, pixel.y, pixel.oldColour);
-		return true;
-	}
+	virtual bool undo(SodaCanvas* canvas);
 
 	//if there's no new pixels to add, then we don't do anything
-	virtual bool isValid() const override
-	{
-		return !Pixels.empty() && image;
-	}
+	virtual bool isValid() const override;
 
 private:
-	Image* image;
+	size_t	layer_id;
 	std::set<FPixel> Pixels;
 };
 
-/*
-Command that Activates 1 layer
-*/
-class FSodaActivateLayerCommand
-{
-public:
-
-	FSodaActivateLayerCommand(size_t layerToActivate_)
-		: layerToActivate(layerToActivate_) {}
-
-	//moved these functionalities to CPP because we need SodaCanvas functionality
-	virtual bool execute(SodaCanvas* canvas);
-	virtual bool undo(SodaCanvas* canvas);
-
-	virtual bool isValid()
-	{
-		return true;
-	}
-
-private:
-	size_t layerToActivate;
-	size_t prevActiveLayer;
-	bool prevActiveLayerValid;
-};
 
 /*
-
+Creates a Layer on Execute (if source is specified, it copies the image into this layer)
+- in Undo, it deletes such layer but doesn't save any copy 
 */
 class FSodaCreateLayerCommand : public FSodaCommand
 {
 public:
-	FSodaCreateLayerCommand(size_t id_) : id(id_) {}
+	FSodaCreateLayerCommand(size_t id_, const Image& image_) : id(id_), validImage(true)
+	{
+		image = image_;
+	}
+	FSodaCreateLayerCommand(size_t id_) : id(id_), validImage(false) {}
 
 	virtual bool execute(SodaCanvas* canvas);
 	virtual bool undo(SodaCanvas* canvas);
@@ -146,18 +110,18 @@ public:
 
 private:
 	size_t id;
+	Image image;
+	bool validImage;
 };
 
 /*
-This command was separated from the CreateLayer command because we do
-care what was deleted! It must be stored somewhere so here is where we stoered what we deleted
+This command is the same as FSodaCreateLayerCommand.
+It's just reversed and it saves a copy before deleting (to restore it after!)
 */
 class FSodaDeleteLayerCommand : public FSodaCommand
 {
 public:
-
 	FSodaDeleteLayerCommand(size_t id_) : id(id_) {}
-	virtual ~FSodaDeleteLayerCommand() {}
 
 	virtual bool execute(SodaCanvas* canvas);
 	virtual bool undo(SodaCanvas* canvas);
@@ -169,5 +133,5 @@ public:
 
 private:
 	size_t id;
-	Image  image;
+	Image image;
 };

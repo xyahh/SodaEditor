@@ -128,6 +128,6 @@ Component* DraggableListBoxModel::refreshComponentForRow(int rowNumber,
 	if (isPositiveAndBelow(rowNumber, modelData.getNumItems()))
 	{
 		item = new DraggableListBoxItem(listBox, modelData, rowNumber);
-	}
+	} 
 	return item.release();
 }

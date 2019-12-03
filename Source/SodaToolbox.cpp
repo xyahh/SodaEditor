@@ -28,28 +28,28 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SodaToolbox::SodaToolbox(SodaCanvas* canvas_)
-	: listBoxModel(listBox, itemData)
+SodaToolbox::SodaToolbox (SodaCanvas* canvas_)
+    : listBoxModel(listBox, itemData)
 {
-	//[Constructor_pre] You can add your own custom stuff here..
-	//[/Constructor_pre]
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
 
-	imagePreview.reset(new GroupComponent("imagePreview",
-		TRANS("Preview")));
-	addAndMakeVisible(imagePreview.get());
+    imagePreview.reset (new GroupComponent ("imagePreview",
+                                            TRANS("Preview")));
+    addAndMakeVisible (imagePreview.get());
 
-	layerGroup.reset(new GroupComponent("layerGroup",
-		TRANS("Layers")));
-	addAndMakeVisible(layerGroup.get());
+    layerGroup.reset (new GroupComponent ("layerGroup",
+                                          TRANS("Layers")));
+    addAndMakeVisible (layerGroup.get());
 
-	createLayerButton.reset(new TextButton("createLayerButton"));
-	addAndMakeVisible(createLayerButton.get());
-	createLayerButton->setButtonText(TRANS("Create Layer"));
-	createLayerButton->addListener(this);
-	createLayerButton->setColour(TextButton::buttonColourId, Colour(0x20ffffff));
+    createLayerButton.reset (new TextButton ("createLayerButton"));
+    addAndMakeVisible (createLayerButton.get());
+    createLayerButton->setButtonText (TRANS("Create Layer"));
+    createLayerButton->addListener (this);
+    createLayerButton->setColour (TextButton::buttonColourId, Colour (0x20ffffff));
 
 
-	//[UserPreSize]
+    //[UserPreSize]
 
 	sodaCanvas = canvas_;
 	sodaCanvas->OnLayerCreated.Bind([&](size_t id) {
@@ -57,20 +57,7 @@ SodaToolbox::SodaToolbox(SodaCanvas* canvas_)
 	});
 	sodaCanvas->OnLayerDestroyed.Bind([&](size_t id)
 	{
-		//we must have at least 2 layers to delete!
-		//there must be at least one layer present!
-		if (itemData.layerInfo.size() > 1)
-		{
-			for (size_t i = 0; i < itemData.layerInfo.size(); ++i)
-			{
-				if (itemData.layerInfo[i]->layerID == id)
-				{
-					itemData.layerInfo.remove(i, true);
-					break;
-				}
-			}
-			listBox.updateContent();
-		}
+		layerDestroyed(id);
 	});
 
 	listBoxModel.setCanvas(sodaCanvas);
@@ -186,6 +173,24 @@ void SodaToolbox::layerCreated(size_t layer_id)
 	item->layerID = layer_id;
 	itemData.layerInfo.add(item);
 	listBox.updateContent();
+}
+
+void SodaToolbox::layerDestroyed(size_t layer_id)
+{
+	//we must have at least 2 layers to delete!
+		//there must be at least one layer present!
+	if (itemData.layerInfo.size() > 1)
+	{
+		for (size_t i = 0; i < itemData.layerInfo.size(); ++i)
+		{
+			if (itemData.layerInfo[i]->layerID == layer_id)
+			{
+				itemData.layerInfo.remove(i, true);
+				break;
+			}
+		}
+		listBox.updateContent();
+	}
 }
 
 //[/MiscUserCode]

@@ -20,8 +20,9 @@ FSodaEraserBrush	SodaEraserBrush;
 
 void FSodaBrush::resetPixels(Image* image)
 {
-	FSodaDrawCommand drawCommand(image, std::move(Pixels));
-	drawCommand.undo(nullptr); //canvas can be nullptr here since we only deal with Image
+	//set the old color of the pixel
+	for (auto& pixel : Pixels)
+		image->setPixelAt(pixel.x, pixel.y, pixel.oldColour);
 }
 
 void FSodaBrush::startDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)

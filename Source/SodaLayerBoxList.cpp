@@ -119,7 +119,8 @@ LayerListComponent::~LayerListComponent()
 
 void LayerListComponent::paint(Graphics& g)
 {
-	if (layerData && sodaCanvas->isActiveLayer(layerData->layerInfo[rowNum]->layerID))
+	auto& info = layerData->layerInfo;
+	if (layerData && sodaCanvas->isActiveLayer(info[rowNum]->layerID))
 		g.fillAll(Colours::lightsalmon);
 	else 
 		g.fillAll(Colours::lightgrey);	

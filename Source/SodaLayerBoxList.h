@@ -77,12 +77,14 @@ public:
 	void resized() override;
 
 protected:
-
-	size_t		onLayerDestroyedID;
+	//ptr to canvas so that we can call 'Activate Layer' or 'Destroy layer' when the 
+	// buttons are clicked
 	SodaCanvas* sodaCanvas;
 	Rectangle<int> dataArea;
 	TextButton activateLayerButton;
 	TextButton deleteLayerButton;
+
+	//pointer to the model data found in the parent. to avoid having to always do dynamic cast 
 	LayerListBoxItemData* layerData;
 
 private:

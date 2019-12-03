@@ -13,26 +13,45 @@
 
 /*
 ==============================================================================
-Activate Layer Command
+Draw Command
 ==============================================================================
 */
 
-
-bool FSodaActivateLayerCommand::execute(SodaCanvas * canvas)
+bool FSodaDrawCommand::execute(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	prevActiveLayerValid = canvas->getActiveLayer(&prevActiveLayer);
-	if (!canvas->setActiveLayer(layerToActivate))
-		return false;
+
+	//find the layer behind the id given
+	SodaLayer* layer;
+	if (false == canvas->getLayer(layer_id, &layer)) return false;
+	Image* image = layer->getLayerImage();
+
+	//set the new color of the pixel
+	for (auto& pixel : Pixels)
+		image->setPixelAt(pixel.x, pixel.y, pixel.newColour);
 	return true;
 }
 
-bool FSodaActivateLayerCommand::undo(SodaCanvas * canvas)
+bool FSodaDrawCommand::undo(SodaCanvas * canvas)
 {
-	//check if the previous layer was a valid one
-	if (prevActiveLayerValid  && canvas)
-		return canvas->setActiveLayer(prevActiveLayer);
-	return false;
+	if (!canvas) return false;
+
+	//find the layer behind the id given
+	SodaLayer* layer;
+	if (false == canvas->getLayer(layer_id, &layer)) return false;
+	Image* image = layer->getLayerImage();
+
+	//set the old color of the pixel
+	for (auto& pixel : Pixels)
+		image->setPixelAt(pixel.x, pixel.y, pixel.oldColour);
+	return true;
+}
+
+//if there's no new pixels to add, then we don't do anything
+
+bool FSodaDrawCommand::isValid() const
+{
+	return !Pixels.empty();
 }
 
 
@@ -44,13 +63,22 @@ Create Layer Command
 bool FSodaCreateLayerCommand::execute(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	return canvas->createLayer(id);
+
+	Image* pImage = nullptr;
+	if (validImage)
+		pImage = &image;
+	return canvas->createLayer_CommandCalled(id, pImage);
 }
 
 bool FSodaCreateLayerCommand::undo(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	return canvas->deleteLayer(id);
+
+	Image* pImage = nullptr;
+	if (validImage)
+		pImage = &image;
+
+	return canvas->deleteLayer_CommandCalled(id, pImage);
 }
 
 
@@ -63,25 +91,12 @@ Delete Layer Command
 bool FSodaDeleteLayerCommand::execute(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	SodaLayer* pLayer;
-	if (canvas->getLayer(id, &pLayer))
-	{
-		//save a copy of the image before deleting so that we can restore if we undo
-		image = pLayer->getLayerImage()->createCopy();
-		return canvas->deleteLayer(id);
-	}
-	return false;
+	return canvas->deleteLayer_CommandCalled(id, &image);
 }
 
 bool FSodaDeleteLayerCommand::undo(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	SodaLayer* pLayer;
-	if (!canvas->createLayer(id))
-		return false;
-	if (canvas->getLayer(id, &pLayer))
-	{
-		//restore the image 
-		(*pLayer->getLayerImage()) = image.createCopy();
-	}
+	return canvas->createLayer_CommandCalled(id, &image);
 }
+

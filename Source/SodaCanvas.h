@@ -96,10 +96,16 @@ public:
 	*/
 	bool setActiveLayer(size_t id);
 
-	/* Gets the Current Active Layer
-	@ returns true if the id was found and the index mapped was in range & was activated. false if out of range or id not found
+	/* Sets Active Layer by first Deactivating the Currently active one and then
+	activating the new one
+	@ returns true if the index was in range & was activated. false if index out of range 
 	*/
-	bool getActiveLayer(size_t* id) const;
+	bool setActiveLayerIndex(size_t index);
+
+
+	/* Gets the Current Active Layer ID
+	*/
+	void getActiveLayerID(size_t* id) const;
 
 	/*
 	checks whether a given id is the active layer
@@ -119,17 +125,35 @@ public:
 	Gets current Active Layer as a pointer
 	@ returns true if
 	*/
-	bool getLayer(size_t Index, SodaLayer** outLayer);
+	bool getLayer(size_t id, SodaLayer** outLayer);
 
 	void resizeLayer(SodaLayer& layer);
 	/*
 	Pushes a NEW command into the Undo Stack and
 	deletes all the commands from the redo stack as we are writing
 	a new timeline of commands
+
+	@returns true if successful. returns the Execute result if ExecuteFlag is true
+	@ returns false if Execute result is false or if command is invalid
 	*/
-	void registerNewCommand(FSodaCommand* command, bool execute);
+	bool registerNewCommand(FSodaCommand* command, bool execute);
 	bool undo();
 	bool redo();
+
+
+	/*
+	Internal creation of layer (should only be used by Commands)
+	if image source is specified, it copies the contents of source
+	into the new layer
+	*/
+	bool createLayer_CommandCalled(size_t id, Image* source);
+
+	/*
+	Internal deletion of layer (should only be used by Commands)
+	if copy is specified, it copies the contents of the layer into copy
+	*/
+	bool deleteLayer_CommandCalled(size_t id, Image* copy);
+
 
 	/* Saves the Canvas to file
 	@param filename: The destination of the image(s). if it's more
@@ -179,7 +203,7 @@ private:
 	i.e. a layer with a higher index will be drawn over
 	a layer with lower index
 	*/
-	std::deque<SodaLayer> layers;
+	std::deque<SodaLayer*> layers;
 
 	/*
 	A map that maps one given ID to the actual index
@@ -188,6 +212,11 @@ private:
 	the indices/ids of layers from other components
 	*/
 	std::map<size_t, size_t> layerIDmap;
+
+	/*
+	Indicator of the Id of the currently Active Layer.
+	*/
+	size_t activeLayerId;
 
 	/*
 	Indicator of the Index of the currently Active Layer.

@@ -50,6 +50,7 @@ public:
 
 	void createLayer();
 	void layerCreated(size_t layer_id);
+	void layerDestroyed(size_t layer_id);
 
     //[/UserMethods]
 

@@ -46,8 +46,9 @@ SodaCanvas::SodaCanvas ()
     //[Constructor] You can add your own custom stuff here..
 	//reset playback settings to 0
 	playbackSettings = 0;
-		//for now only have one layer at init time. layer id = 0
-	createLayer(0);
+	//for now only have one layer at init time. layer id = 0
+	//createLayer(0);
+	createLayer_CommandCalled(0, nullptr);
 
 	canvasUpdateFPS = 60;
 	setFramesPerSecond(canvasUpdateFPS);
@@ -66,6 +67,23 @@ SodaCanvas::~SodaCanvas()
 
 
     //[Destructor]. You can add your own custom destruction code here..
+
+	//deallocate every layer
+	for (auto& layer : layers)
+		delete layer;
+
+	//deallocate all commands 
+	while (!undoStack.empty())
+	{
+		delete undoStack.top();
+		undoStack.pop();
+	}
+
+	while (!redoStack.empty())
+	{
+		delete redoStack.top();
+		redoStack.pop();
+	}
     //[/Destructor]
 }
 
@@ -86,7 +104,7 @@ void SodaCanvas::paint (Graphics& g)
 	@ We are not adding them as childs because they would be
 	*/
 	if (layers.size() > 0)
-		layers[activeLayer].paint(g);
+		layers[activeLayer]->paint(g);
 
 	//draw Grid begin
 	if (gProperties.isGridVisible)
@@ -115,10 +133,10 @@ void SodaCanvas::resized()
 
     //[UserResized] Add your own custom resize handling here..
 	for (auto& i : layers)
-		resizeLayer(i);
+		resizeLayer(*i);
 
 	if(layers.size() > 0)
-		layerBounds = layers[activeLayer].getBounds();
+		layerBounds = layers[activeLayer]->getBounds();
     //[/UserResized]
 }
 
@@ -128,7 +146,7 @@ void SodaCanvas::mouseDown (const MouseEvent& e)
 	isDrawing = true;
 	//do not draw if we're playing the sprite!
 	if (layers.size() > 0 && !(playbackSettings & ESodaPlayback::Playback_Playing))
-		layers[activeLayer].startDraw(e);
+		layers[activeLayer]->startDraw(e);
 
     //[/UserCode_mouseDown]
 }
@@ -139,7 +157,7 @@ void SodaCanvas::mouseDrag (const MouseEvent& e)
 	isDrawing = true;
 	//do not draw if we're playing the sprite!
 	if (layers.size() > 0 && !(playbackSettings & ESodaPlayback::Playback_Playing))
-		layers[activeLayer].updateMousePos(e);
+		layers[activeLayer]->updateMousePos(e);
 
     //[/UserCode_mouseDrag]
 }
@@ -152,14 +170,14 @@ void SodaCanvas::mouseUp (const MouseEvent& e)
 	if (layers.size() > 0 && isDrawing)
 	{
 		std::set<FPixel> Pixels;
-		layers[activeLayer].endDraw(e, &Pixels);
+		layers[activeLayer]->endDraw(e, &Pixels);
 		if (!Pixels.empty())
 		{
 			//if newPixels & oldPixels have size then we add the Draw command
 			// but DONT execute it since it already happened.
 			registerNewCommand(
 				new FSodaDrawCommand(
-					layers[activeLayer].getLayerImage(),
+					activeLayerId,
 					std::move(Pixels)
 				), false
 			);
@@ -203,7 +221,7 @@ bool SodaCanvas::keyPressed (const KeyPress& key)
 void SodaCanvas::update()
 {
 	if (layers.size() > 0)
-		layers[activeLayer].update();
+		layers[activeLayer]->update();
 
 	//check if we have the Playback_Playing setting ON and there's no Drawing taking place to proceed
 	if (playbackSettings & ESodaPlayback::Playback_Playing && !isDrawing)
@@ -230,31 +248,18 @@ void SodaCanvas::update()
 
 bool SodaCanvas::createLayer(size_t id)
 {
-	size_t temp_index;
-	//if find returns true, we don't process further. The layer ID already exists.
-	if (findLayerIndex(id, &temp_index))
-		return false;
-
-	layers.emplace_back(resolution, resolution);
-	size_t index = layers.size() - 1;
-
-	layerIDmap.emplace(id, index);
-	setActiveLayer(id);
-
-	//set bounds so that we see the layer at the center
-	resizeLayer(layers.back());
-
-	registerNewCommand(new FSodaCreateLayerCommand(id), false);
-
-	OnLayerCreated.Call(id);
-
-	return true;
+	//create a new command and register into undo stack and execute it
+	FSodaCreateLayerCommand* pCommand;
+	pCommand = new FSodaCreateLayerCommand(id);
+	return registerNewCommand(pCommand, true);
 }
 
 bool SodaCanvas::deleteLayer(size_t id)
 {
-	OnLayerDestroyed.Call(id);
-	return true;
+	//create a new command and register into undo stack and execute it
+	FSodaDeleteLayerCommand* pCommand;
+	pCommand = new FSodaDeleteLayerCommand(id);
+	return registerNewCommand(pCommand, true);
 }
 
 bool SodaCanvas::swapLayers(size_t targetLayerID, size_t otherLayerID)
@@ -279,48 +284,45 @@ void SodaCanvas::setPlaybackFPS(int FPS)
 
 bool SodaCanvas::setActiveLayer(size_t id)
 {
-
 	size_t index;
 	//find layer mapped
 	if (false == findLayerIndex(id, &index)) return false;
 
+	return setActiveLayerIndex(index);
+}
+
+bool SodaCanvas::setActiveLayerIndex(size_t index)
+{
 	//don't do anything if its outside the range..
 	if (index < 0 || index >= layers.size()) return false;
 
 	//Deactivate the Current Layer if we know it's a Valid one!
 	if (activeLayer >= 0 && activeLayer < layers.size())
-		layers[activeLayer].setVisible(false);
+		layers[activeLayer]->setVisible(false);
 
 	activeLayer = index;
+	
+	for (auto& i : layerIDmap)
+		if (i.second == activeLayer)
+		{
+			activeLayerId = i.first;
+			break;
+		}
 
 	//show the new layer and call its activation func
-	layers[activeLayer].setVisible(true);
-	layers[activeLayer].onActivation();
-
+	layers[activeLayer]->setVisible(true);
+	layers[activeLayer]->onActivation();
 	return true;
 }
 
-bool SodaCanvas::getActiveLayer(size_t * outID) const
+void SodaCanvas::getActiveLayerID(size_t * outID) const
 {
-	for (auto& i : layerIDmap)
-	{
-		//check if the index mapped is the active layer
-		if (i.second == activeLayer)
-		{
-			//return the id;
-			*outID = i.first;
-			return true;
-		}
-	}
-	return false;
+	*outID = activeLayerId;
 }
 
 bool SodaCanvas::isActiveLayer(size_t id) const
 {
-	size_t index;
-	if (false == findLayerIndex(id, &index))
-		return false;
-	return index == activeLayer;
+	return activeLayerId == id;
 }
 
 bool SodaCanvas::findLayerIndex(size_t id, size_t * outIndex) const
@@ -343,7 +345,7 @@ bool SodaCanvas::getLayer(size_t id, SodaLayer** outLayer)
 	if (Index >= 0 && Index < layers.size())
 	{
 		//change the outindex to the active layer if valid and return true
-		*outLayer = &layers[Index];
+		*outLayer = layers[Index];
 		return true;
 	}
 	return false;
@@ -373,9 +375,20 @@ void SodaCanvas::resizeLayer(SodaLayer & layer)
 		, resolution * gProperties.pixelSize);
 }
 
-void SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)
+bool SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)
 {
-	if (!command) return;
+	if (!command) return false;
+
+	//execute if bool is true. 
+	if (execute)
+	{
+		//if execution fails, don't push to stack
+		if (false == command->execute(this))
+		{
+			delete command;
+			return false;
+		}
+	}
 
 	//clear the redoStack when there's a new action incoming, since we are writing a new history
 	while (!redoStack.empty())
@@ -383,12 +396,10 @@ void SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)
 		delete redoStack.top();
 		redoStack.pop();
 	}
-	//execute if bool is true. Should only be false for the Drawing command (as it is recording Coords and Colours
-	// until Mouse is up!)
-	if (execute)
-		command->execute(this);
+
 	//push command to undo stack.
 	undoStack.emplace(command);
+	return true;
 }
 
 bool SodaCanvas::undo()
@@ -440,6 +451,61 @@ bool SodaCanvas::redo()
 		}
 	}
 	return false;
+}
+
+bool SodaCanvas::createLayer_CommandCalled(size_t id, Image* source)
+{
+	size_t temp_index;
+	//if find returns true, we don't process further. The layer ID already exists.
+	if (findLayerIndex(id, &temp_index))
+		return false;
+
+	layers.emplace_back(new SodaLayer(resolution, resolution));
+	size_t index = layers.size() - 1;
+
+	layerIDmap.emplace(id, index);
+	setActiveLayer(id);
+
+	SodaLayer* layer = layers.back();
+	//set bounds so that we see the layer at the center
+	resizeLayer(*layer);
+
+	if(source)
+		*(layer->getLayerImage()) = source->createCopy();
+
+	OnLayerCreated.Call(id);
+
+	return true;
+}
+
+bool SodaCanvas::deleteLayer_CommandCalled(size_t id, Image* copy) 
+{
+	size_t index;
+	//find the index to the layer we want to delete
+	if (false == findLayerIndex(id, &index))
+		return false;
+	if (index >= 0 && index < layers.size())
+	{
+		//decrease all the indices that are going to be moved down
+		// from the map. We preserve the IDs but their indices will decrease by 1
+		for (auto& i : layerIDmap)
+			if (i.second >= index)
+				--i.second;
+		
+		if (copy)
+			*copy = layers[index]->getLayerImage()->createCopy();
+
+		delete layers[index];
+
+		layers.erase(layers.begin() + index);
+		setActiveLayerIndex(index);//automatically try to get the appropriate id
+		OnLayerDestroyed.Call(id);
+		
+		layerIDmap.erase(id);
+		return true;
+	}
+	else
+		return false;
 }
 
 void SodaCanvas::saveCanvasToFile(const String & filename, bool layerPerFile)
