@@ -89,9 +89,9 @@ LayerListComponent::LayerListComponent(DraggableListBox& lb, LayerListBoxItemDat
 	//cast to what we actually have, the LayerListBox
 	layerData = dynamic_cast<LayerListBoxItemData*>(&modelData);	
 
-	//set current item to active
-	if (layerData)
-		sodaCanvas->setActiveLayer(layerData->layerInfo[rowNum]->layerID);
+	////set current item to active
+	//if (layerData)
+	//	sodaCanvas->setActiveLayer(layerData->layerInfo[rowNum]->layerID);
 
 	activateLayerButton.setButtonText("Activate");
 	activateLayerButton.onClick = [this]()
@@ -120,6 +120,8 @@ LayerListComponent::~LayerListComponent()
 void LayerListComponent::paint(Graphics& g)
 {
 	auto& info = layerData->layerInfo;
+	if (info[rowNum] == nullptr) return;
+
 	if (layerData && sodaCanvas->isActiveLayer(info[rowNum]->layerID))
 		g.fillAll(Colours::lightsalmon);
 	else 

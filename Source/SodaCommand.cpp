@@ -47,19 +47,12 @@ bool FSodaDrawCommand::undo(SodaCanvas * canvas)
 	return true;
 }
 
-//if there's no new pixels to add, then we don't do anything
-
-bool FSodaDrawCommand::isValid() const
-{
-	return !Pixels.empty();
-}
-
-
 /*
 ==============================================================================
 Create Layer Command
 ==============================================================================
 */
+
 bool FSodaCreateLayerCommand::execute(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
@@ -67,7 +60,7 @@ bool FSodaCreateLayerCommand::execute(SodaCanvas * canvas)
 	Image* pImage = nullptr;
 	if (validImage)
 		pImage = &image;
-	return canvas->createLayer_CommandCalled(id, pImage);
+	return canvas->createLayer_Internal(id, pImage);
 }
 
 bool FSodaCreateLayerCommand::undo(SodaCanvas * canvas)
@@ -78,7 +71,7 @@ bool FSodaCreateLayerCommand::undo(SodaCanvas * canvas)
 	if (validImage)
 		pImage = &image;
 
-	return canvas->deleteLayer_CommandCalled(id, pImage);
+	return canvas->deleteLayer_Internal(id, pImage);
 }
 
 
@@ -91,12 +84,41 @@ Delete Layer Command
 bool FSodaDeleteLayerCommand::execute(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	return canvas->deleteLayer_CommandCalled(id, &image);
+	return canvas->deleteLayer_Internal(id, &image);
 }
 
 bool FSodaDeleteLayerCommand::undo(SodaCanvas * canvas)
 {
 	if (!canvas) return false;
-	return canvas->createLayer_CommandCalled(id, &image);
+	return canvas->createLayer_Internal(id, &image);
 }
 
+/*
+==============================================================================
+Activate Layer Command
+==============================================================================
+*/
+
+FSodaActivateLayerCommand::FSodaActivateLayerCommand(size_t id_) : id(id_) 
+{
+	prevIDset = false;
+}
+
+bool FSodaActivateLayerCommand::execute(SodaCanvas * canvas)
+{
+	if (!canvas) return false;
+
+	if (!prevIDset)
+	{
+		canvas->getActiveLayerID(&prev_id);
+		prevIDset = true;
+	}
+
+	return canvas->setActiveLayer_Internal(id);
+}
+
+bool FSodaActivateLayerCommand::undo(SodaCanvas * canvas)
+{
+	if (!canvas) return false;
+	return canvas->setActiveLayer_Internal(prev_id);
+}

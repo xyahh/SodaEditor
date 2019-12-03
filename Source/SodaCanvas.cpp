@@ -48,7 +48,7 @@ SodaCanvas::SodaCanvas ()
 	playbackSettings = 0;
 	//for now only have one layer at init time. layer id = 0
 	//createLayer(0);
-	createLayer_CommandCalled(0, nullptr);
+	createLayer_Internal(0, nullptr);
 
 	canvasUpdateFPS = 60;
 	setFramesPerSecond(canvasUpdateFPS);
@@ -72,7 +72,7 @@ SodaCanvas::~SodaCanvas()
 	for (auto& layer : layers)
 		delete layer;
 
-	//deallocate all commands 
+	//deallocate all commands
 	while (!undoStack.empty())
 	{
 		delete undoStack.top();
@@ -240,7 +240,7 @@ void SodaCanvas::update()
 				deltaLayer = -1;
 			}
 
-			setActiveLayer((activeLayer + deltaLayer) % layers.size());
+			setActiveLayer_Internal((activeLayer + deltaLayer) % layers.size());
 		}
 	}
 
@@ -262,6 +262,13 @@ bool SodaCanvas::deleteLayer(size_t id)
 	return registerNewCommand(pCommand, true);
 }
 
+bool SodaCanvas::setActiveLayer(size_t id)
+{
+	FSodaActivateLayerCommand* pCommand;
+	pCommand = new FSodaActivateLayerCommand(id);
+	return registerNewCommand(pCommand, true);
+}
+
 bool SodaCanvas::swapLayers(size_t targetLayerID, size_t otherLayerID)
 {
 	return true;
@@ -280,39 +287,6 @@ void SodaCanvas::removePlaybackSettings(int Settings)
 void SodaCanvas::setPlaybackFPS(int FPS)
 {
 	playbackFPS = FPS;
-}
-
-bool SodaCanvas::setActiveLayer(size_t id)
-{
-	size_t index;
-	//find layer mapped
-	if (false == findLayerIndex(id, &index)) return false;
-
-	return setActiveLayerIndex(index);
-}
-
-bool SodaCanvas::setActiveLayerIndex(size_t index)
-{
-	//don't do anything if its outside the range..
-	if (index < 0 || index >= layers.size()) return false;
-
-	//Deactivate the Current Layer if we know it's a Valid one!
-	if (activeLayer >= 0 && activeLayer < layers.size())
-		layers[activeLayer]->setVisible(false);
-
-	activeLayer = index;
-	
-	for (auto& i : layerIDmap)
-		if (i.second == activeLayer)
-		{
-			activeLayerId = i.first;
-			break;
-		}
-
-	//show the new layer and call its activation func
-	layers[activeLayer]->setVisible(true);
-	layers[activeLayer]->onActivation();
-	return true;
 }
 
 void SodaCanvas::getActiveLayerID(size_t * outID) const
@@ -379,7 +353,7 @@ bool SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)
 {
 	if (!command) return false;
 
-	//execute if bool is true. 
+	//execute if bool is true.
 	if (execute)
 	{
 		//if execution fails, don't push to stack
@@ -453,7 +427,7 @@ bool SodaCanvas::redo()
 	return false;
 }
 
-bool SodaCanvas::createLayer_CommandCalled(size_t id, Image* source)
+bool SodaCanvas::createLayer_Internal(size_t id, Image* source)
 {
 	size_t temp_index;
 	//if find returns true, we don't process further. The layer ID already exists.
@@ -464,7 +438,7 @@ bool SodaCanvas::createLayer_CommandCalled(size_t id, Image* source)
 	size_t index = layers.size() - 1;
 
 	layerIDmap.emplace(id, index);
-	setActiveLayer(id);
+	setActiveLayer_Internal(id);
 
 	SodaLayer* layer = layers.back();
 	//set bounds so that we see the layer at the center
@@ -478,7 +452,7 @@ bool SodaCanvas::createLayer_CommandCalled(size_t id, Image* source)
 	return true;
 }
 
-bool SodaCanvas::deleteLayer_CommandCalled(size_t id, Image* copy) 
+bool SodaCanvas::deleteLayer_Internal(size_t id, Image* copy)
 {
 	size_t index;
 	//find the index to the layer we want to delete
@@ -491,21 +465,56 @@ bool SodaCanvas::deleteLayer_CommandCalled(size_t id, Image* copy)
 		for (auto& i : layerIDmap)
 			if (i.second >= index)
 				--i.second;
-		
+
 		if (copy)
 			*copy = layers[index]->getLayerImage()->createCopy();
 
 		delete layers[index];
 
 		layers.erase(layers.begin() + index);
-		setActiveLayerIndex(index);//automatically try to get the appropriate id
-		OnLayerDestroyed.Call(id);
 		
+		if (index >= layers.size())
+			index = layers.size() - 1;
+
+		setActiveLayerIndex_Internal(index);
+		OnLayerDestroyed.Call(id);
+
 		layerIDmap.erase(id);
 		return true;
 	}
 	else
 		return false;
+}
+
+bool SodaCanvas::setActiveLayerIndex_Internal(size_t index)
+{
+	//don't do anything if its outside the range..
+	if (index < 0 || index >= layers.size()) return false;
+
+	//Deactivate the Current Layer if we know it's a Valid one!
+	if (activeLayer >= 0 && activeLayer < layers.size())
+		layers[activeLayer]->setVisible(false);
+
+	activeLayer = index;
+
+	for (auto& i : layerIDmap)
+		if (i.second == activeLayer)
+		{
+			activeLayerId = i.first;
+			break;
+		}
+
+	//show the new layer and call its activation func
+	layers[activeLayer]->setVisible(true);
+	layers[activeLayer]->onActivation();
+	return true;
+}
+
+bool SodaCanvas::setActiveLayer_Internal(size_t id)
+{
+	size_t index;
+	if (false == findLayerIndex(id, &index)) return false;
+	return setActiveLayerIndex_Internal(index);
 }
 
 void SodaCanvas::saveCanvasToFile(const String & filename, bool layerPerFile)

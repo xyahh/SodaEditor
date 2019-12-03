@@ -98,9 +98,9 @@ public:
 
 	/* Sets Active Layer by first Deactivating the Currently active one and then
 	activating the new one
-	@ returns true if the index was in range & was activated. false if index out of range 
+	@ returns true if the index was in range & was activated. false if index out of range
 	*/
-	bool setActiveLayerIndex(size_t index);
+	bool setActiveLayerIndex_Internal(size_t index);
 
 
 	/* Gets the Current Active Layer ID
@@ -146,14 +146,20 @@ public:
 	if image source is specified, it copies the contents of source
 	into the new layer
 	*/
-	bool createLayer_CommandCalled(size_t id, Image* source);
+	bool createLayer_Internal(size_t id, Image* source);
 
 	/*
 	Internal deletion of layer (should only be used by Commands)
 	if copy is specified, it copies the contents of the layer into copy
 	*/
-	bool deleteLayer_CommandCalled(size_t id, Image* copy);
+	bool deleteLayer_Internal(size_t id, Image* copy);
 
+	/*
+	Internal func to set an Active Layer with the given id.
+	returns false if no id was found. 
+	returns true if operation was successful
+	*/
+	bool setActiveLayer_Internal(size_t id);
 
 	/* Saves the Canvas to file
 	@param filename: The destination of the image(s). if it's more
@@ -180,7 +186,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	
+
 public:
 
 	/*

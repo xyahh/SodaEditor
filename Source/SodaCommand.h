@@ -49,12 +49,6 @@ public:
 	*/
 	virtual bool undo(SodaCanvas* canvas) = 0;
 
-	/*
-	this func check whethers this command can be executed/undone
-	or has any meaning at all.
-	(e.g. executing a command on a deleted image would return false);
-	*/
-	virtual bool isValid() const = 0;
 };
 
 /*
@@ -78,9 +72,6 @@ public:
 
 	virtual bool undo(SodaCanvas* canvas);
 
-	//if there's no new pixels to add, then we don't do anything
-	virtual bool isValid() const override;
-
 private:
 	size_t	layer_id;
 	std::set<FPixel> Pixels;
@@ -103,11 +94,6 @@ public:
 	virtual bool execute(SodaCanvas* canvas);
 	virtual bool undo(SodaCanvas* canvas);
 
-	virtual bool isValid() const override
-	{
-		return true;
-	}
-
 private:
 	size_t id;
 	Image image;
@@ -126,12 +112,27 @@ public:
 	virtual bool execute(SodaCanvas* canvas);
 	virtual bool undo(SodaCanvas* canvas);
 
-	virtual bool isValid() const override
-	{
-		return true;
-	}
-
 private:
 	size_t id;
 	Image image;
+};
+
+/*
+Activates a Layer of a given ID.
+@ in Undo, it activates the layer that was previously activated.
+*/
+class FSodaActivateLayerCommand : public FSodaCommand
+{
+public:
+	FSodaActivateLayerCommand(size_t id_);
+
+	virtual bool execute(SodaCanvas* canvas);
+	virtual bool undo(SodaCanvas* canvas);
+
+private:
+	size_t id;
+	size_t prev_id;
+
+	//check whether its first time we do this
+	bool prevIDset;
 };

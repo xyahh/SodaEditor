@@ -110,9 +110,9 @@ void SodaPlayer::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    playButton->setBounds ((getWidth() / 2) + -60 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.7997f) / 2), 80, proportionOfHeight (0.7997f));
-    reverseButton->setBounds (getWidth() - 30 - 120, (getHeight() / 2) - (proportionOfHeight (0.7997f) / 2), 120, proportionOfHeight (0.7997f));
-    pauseButton->setBounds ((getWidth() / 2) + 60 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.7997f) / 2), 80, proportionOfHeight (0.7997f));
+    playButton->setBounds ((getWidth() / 2) + -60 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.8000f) / 2), 80, proportionOfHeight (0.8000f));
+    reverseButton->setBounds (getWidth() - 30 - 120, (getHeight() / 2) - (proportionOfHeight (0.8000f) / 2), 120, proportionOfHeight (0.8000f));
+    pauseButton->setBounds ((getWidth() / 2) + 60 - (80 / 2), (getHeight() / 2) - (proportionOfHeight (0.8000f) / 2), 80, proportionOfHeight (0.8000f));
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
