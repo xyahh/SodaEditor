@@ -69,12 +69,23 @@ public:
 	void swapLayers(size_t targetLayer, size_t otherLayer);
 
 	/*
-	@ Sets the Animation Playback
-	@ bool: Sets the "isPlaying" flag.
-	@ If true, the Sprites animation will start playing
-	@ if False,
+	@ Adds settings to the Playback
+	@ i.e. performs bitwise operator |= value
+	@ These settings are found in the ESodaPlayback enum
 	*/
-	void setPlayback(ESodaPlayback PlaybackType_);
+	void addPlaybackSettings(int Settings);
+
+	/*
+	@ Removes settings from the Playback
+	@ i.e. performs bitwise operator &= ~value
+	@ These settings are found in the ESodaPlayback enum
+	*/
+	void removePlaybackSettings(int Settings);
+
+	/*
+	@ Sets the FPS of the Playback
+	*/
+	void setPlaybackFPS(int FPS);
 
 	/* Sets Active Layer by first Deactivating the Currently active one and then
 	activating the new one
@@ -89,7 +100,7 @@ public:
 
 	/*
 	Gets current Active Layer as a pointer
-	@ returns true if 
+	@ returns true if
 	*/
 	bool getLayer(size_t Index, SodaLayer** outLayer);
 
@@ -146,13 +157,6 @@ private:
 	size_t activeLayer;
 
 	/*
-	the Size of the Pixels of the Canvas that is drawn into the Window.
-	We can think of it as the 'Zoom' of the Canvas
-	or ratio of the real pixels to the Sprite Pixel
-	*/
-	int pixelSize;
-
-	/*
 	the current Resolution of the Canvas
 	*/
 	int resolution;
@@ -180,25 +184,10 @@ private:
 	std::stack<FSodaCommand*> redoStack;
 
 
-	float timerFrequency;
-	/*
-	Keys to check for in Update func
-	*/
-	KeyPress undoKey;
-	KeyPress redoKey;
-	bool commandDown;
-
-	/*
-	How frequent to call the KeyPresses. if current timer is greater than
-	the currentMultiple, then we go ahead and process they key and
-	divide the currentMultiple by some amount.
-	The currentMultiple becomes smaller and so these actions become more frequent as we go!
-	Clamp at a lowMultiple;
-	*/
-	float	currentTimer;
-	float	currentMultiple;
-	float	lowestMultiple;
-	float	initialMultiple;
+	int canvasUpdateFPS;
+	
+	int updateFramesPassed;
+	int playbackFPS;
 
 
 	/*
@@ -206,7 +195,7 @@ private:
 	Whether it is playing or it's stopped, or what other actions can be performed on the
 	deque of layers.
 	*/
-	ESodaPlayback PlaybackType;
+	int playbackSettings;
 
 	/*
 	bool to inform whether we are currently drawing/erasing to the screen

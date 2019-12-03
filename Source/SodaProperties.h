@@ -72,19 +72,23 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+	SodaCanvas* sodaCanvas;
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<GroupComponent> brushGroup;
+    std::unique_ptr<GroupComponent> canvasGroup;
     std::unique_ptr<TextButton> paletteButton;
     std::unique_ptr<GroupComponent> brushTypeGroup;
-    std::unique_ptr<Slider> brushSlider;
     std::unique_ptr<Label> label;
     std::unique_ptr<ImageButton> freeStyle;
     std::unique_ptr<ImageButton> circleStyle;
     std::unique_ptr<ImageButton> lineStyle;
     std::unique_ptr<ImageButton> rectStyle;
     std::unique_ptr<ImageButton> eraserStyle;
+    std::unique_ptr<Label> label2;
+    std::unique_ptr<Slider> brushSlider;
+    std::unique_ptr<Slider> pixelScaleSlider;
 
 
     //==============================================================================

@@ -64,7 +64,7 @@ SodaToolbox::SodaToolbox (SodaCanvas* canvas_)
 	listBox.setModel(&listBoxModel);
 	//height for each layer item
 	listBox.setRowHeight(40);
-	//colour of the whole list background 
+	//colour of the whole list background
 	listBox.setColour(ListBox::backgroundColourId, Colour::fromFloatRGBA(0.1f, 0.1f, 0.1f, 0.1f));
 	addAndMakeVisible(listBox);
 
@@ -119,7 +119,7 @@ void SodaToolbox::resized()
     //[/UserPreResize]
 
     imagePreview->setBounds (0, 0, proportionOfWidth (1.0000f), 256);
-    layerGroup->setBounds (0, 266, proportionOfWidth (1.0000f), getHeight() - 235);
+    layerGroup->setBounds (0, 266, proportionOfWidth (1.0000f), getHeight() - 266);
     createLayerButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((proportionOfWidth (1.0000f) - 60) / 2), 266 + 30, proportionOfWidth (1.0000f) - 60, 30);
     //[UserResized] Add your own custom resize handling here..
 	auto imagePreviewRect = imagePreview->getBounds().toFloat();
@@ -183,7 +183,7 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="imagePreview" id="8b984c2d2be3b733" memberName="imagePreview"
                   virtualName="" explicitFocusOrder="0" pos="0 0 100% 256" title="Preview"/>
   <GROUPCOMPONENT name="layerGroup" id="fdc7952107ea4195" memberName="layerGroup"
-                  virtualName="" explicitFocusOrder="0" pos="0 266 100% 235M" title="Layers"/>
+                  virtualName="" explicitFocusOrder="0" pos="0 266 100% 266M" title="Layers"/>
   <TEXTBUTTON name="createLayerButton" id="5cd54010d3a7d2fc" memberName="createLayerButton"
               virtualName="" explicitFocusOrder="0" pos="0Cc 30 60M 30" posRelativeX="fdc7952107ea4195"
               posRelativeY="fdc7952107ea4195" posRelativeW="fdc7952107ea4195"

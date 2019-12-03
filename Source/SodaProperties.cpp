@@ -39,6 +39,10 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
     addAndMakeVisible (brushGroup.get());
     brushGroup->setTextLabelPosition (Justification::centredLeft);
 
+    canvasGroup.reset (new GroupComponent ("canvasGroup",
+                                           TRANS("Canvas")));
+    addAndMakeVisible (canvasGroup.get());
+
     paletteButton.reset (new TextButton ("paletteButton"));
     addAndMakeVisible (paletteButton.get());
     paletteButton->setButtonText (TRANS("Palette"));
@@ -48,13 +52,6 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
                                               TRANS("Brush Types")));
     addAndMakeVisible (brushTypeGroup.get());
     brushTypeGroup->setTextLabelPosition (Justification::centredLeft);
-
-    brushSlider.reset (new Slider ("brushSlider"));
-    addAndMakeVisible (brushSlider.get());
-    brushSlider->setRange (1, 25, 1);
-    brushSlider->setSliderStyle (Slider::LinearVertical);
-    brushSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-    brushSlider->addListener (this);
 
     label.reset (new Label ("new label",
                             TRANS("Brush\n"
@@ -107,9 +104,40 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
                             ImageCache::getFromMemory (eraserIcon_png, eraserIcon_pngSize), 1.000f, Colour (0xff353535),
                             Image(), 1.000f, Colours::white,
                             Image(), 1.000f, Colours::white);
+    label2.reset (new Label ("new label",
+                             TRANS("Pixel\n"
+                             "Scale")));
+    addAndMakeVisible (label2.get());
+    label2->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    label2->setJustificationType (Justification::centredLeft);
+    label2->setEditable (false, false, false);
+    label2->setColour (TextEditor::textColourId, Colours::black);
+    label2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    brushSlider.reset (new Slider ("brushSlider"));
+    addAndMakeVisible (brushSlider.get());
+    brushSlider->setRange (1, 25, 1);
+    brushSlider->setSliderStyle (Slider::LinearVertical);
+    brushSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    brushSlider->addListener (this);
+
+    pixelScaleSlider.reset (new Slider ("pixelScaleSlider"));
+    addAndMakeVisible (pixelScaleSlider.get());
+    pixelScaleSlider->setRange (1, 16, 1);
+    pixelScaleSlider->setSliderStyle (Slider::LinearVertical);
+    pixelScaleSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    pixelScaleSlider->addListener (this);
+
 
     //[UserPreSize]
 	{
+		sodaCanvas = canvas_;
+
+		//init values from default inits
+		paletteButton->setColour(TextButton::buttonColourId, gProperties.brushColour);
+		brushSlider->setValue(static_cast<double>(gProperties.brushSize));
+		pixelScaleSlider->setValue(static_cast<double>(gProperties.pixelSize));
+
 		//lambda to init all the style brushes
 		auto InitStyleButtons = [](ImageButton* button) {
 			button->setClickingTogglesState(true);
@@ -146,15 +174,18 @@ SodaProperties::~SodaProperties()
     //[/Destructor_pre]
 
     brushGroup = nullptr;
+    canvasGroup = nullptr;
     paletteButton = nullptr;
     brushTypeGroup = nullptr;
-    brushSlider = nullptr;
     label = nullptr;
     freeStyle = nullptr;
     circleStyle = nullptr;
     lineStyle = nullptr;
     rectStyle = nullptr;
     eraserStyle = nullptr;
+    label2 = nullptr;
+    brushSlider = nullptr;
+    pixelScaleSlider = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -179,15 +210,18 @@ void SodaProperties::resized()
     //[/UserPreResize]
 
     brushGroup->setBounds (0, 0, proportionOfWidth (1.0000f), 250);
-    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
+    canvasGroup->setBounds (0, 500, proportionOfWidth (1.0000f), getHeight() - 500);
+    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
     brushTypeGroup->setBounds (0, 250, proportionOfWidth (1.0000f), 250);
-    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
-    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 20, 150, 50);
-    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3000f), 25);
-    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3000f), 250 + 45, proportionOfWidth (0.3000f), 25);
-    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3000f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
+    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 20, 150, 50);
+    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3002f), 25);
+    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3002f), 250 + 45, proportionOfWidth (0.3002f), 25);
+    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3002f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    label2->setBounds ((0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (500 + 30) + 20, 150, 50);
+    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
+    pixelScaleSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 500 + 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -274,6 +308,15 @@ void SodaProperties::sliderValueChanged (Slider* sliderThatWasMoved)
 		gProperties.brushSize = static_cast<int>(brushSlider->getValue());
         //[/UserSliderCode_brushSlider]
     }
+    else if (sliderThatWasMoved == pixelScaleSlider.get())
+    {
+        //[UserSliderCode_pixelScaleSlider] -- add your slider handling code here..
+		gProperties.pixelSize = static_cast<int>(pixelScaleSlider->getValue());
+
+		//call resized so we can resize everything properly
+		sodaCanvas->resized();
+        //[/UserSliderCode_pixelScaleSlider]
+    }
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
@@ -315,6 +358,8 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="brushGroup" id="2c65e22a40bc686b" memberName="brushGroup"
                   virtualName="" explicitFocusOrder="0" pos="0 0 100% 250" title="Brush"
                   textpos="33"/>
+  <GROUPCOMPONENT name="canvasGroup" id="19d55f7d8fa371b" memberName="canvasGroup"
+                  virtualName="" explicitFocusOrder="0" pos="0 500 100% 500M" title="Canvas"/>
   <TEXTBUTTON name="paletteButton" id="2e78eaf6e5c8fc8a" memberName="paletteButton"
               virtualName="" explicitFocusOrder="0" pos="-0.5Cc 30 75% 24"
               posRelativeX="2c65e22a40bc686b" posRelativeW="2c65e22a40bc686b"
@@ -323,12 +368,6 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="brushTypeGroup" id="ddc968defcd189da" memberName="brushTypeGroup"
                   virtualName="" explicitFocusOrder="0" pos="0 250 100% 250" title="Brush Types"
                   textpos="33"/>
-  <SLIDER name="brushSlider" id="aba3384d7b3a6f33" memberName="brushSlider"
-          virtualName="" explicitFocusOrder="0" pos="-0.5Cc 75 75% 150"
-          posRelativeX="2c65e22a40bc686b" posRelativeY="2c65e22a40bc686b"
-          posRelativeW="2c65e22a40bc686b" min="1.0" max="25.0" int="1.0"
-          style="LinearVertical" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <LABEL name="new label" id="3b1a81302236db98" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="0 20 150 50" posRelativeX="aba3384d7b3a6f33"
          posRelativeY="aba3384d7b3a6f33" edTextCol="ff000000" edBkgCol="0"
@@ -368,6 +407,26 @@ BEGIN_JUCER_METADATA
                needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="eraserIcon_png"
                opacityNormal="1.0" colourNormal="ff353535" resourceOver="" opacityOver="1.0"
                colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
+  <LABEL name="new label" id="c96b68f3b8cabcf7" memberName="label2" virtualName=""
+         explicitFocusOrder="0" pos="0 20 150 50" posRelativeX="c3647bef6f394e22"
+         posRelativeY="c3647bef6f394e22" posRelativeW="c3647bef6f394e22"
+         edTextCol="ff000000" edBkgCol="0" labelText="Pixel&#10;Scale"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
+         italic="0" justification="33"/>
+  <SLIDER name="brushSlider" id="aba3384d7b3a6f33" memberName="brushSlider"
+          virtualName="" explicitFocusOrder="0" pos="-0.5Cc 75 75% 150"
+          posRelativeX="2c65e22a40bc686b" posRelativeY="2c65e22a40bc686b"
+          posRelativeW="2c65e22a40bc686b" min="1.0" max="25.0" int="1.0"
+          style="LinearVertical" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <SLIDER name="pixelScaleSlider" id="c3647bef6f394e22" memberName="pixelScaleSlider"
+          virtualName="" explicitFocusOrder="0" pos="-0.5Cc 30 75% 150"
+          posRelativeX="19d55f7d8fa371b" posRelativeY="19d55f7d8fa371b"
+          posRelativeW="19d55f7d8fa371b" posRelativeH="19d55f7d8fa371b"
+          min="1.0" max="16.0" int="1.0" style="LinearVertical" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

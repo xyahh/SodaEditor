@@ -28,10 +28,9 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SodaLayer::SodaLayer (int width_, int height_, int pixelSize_)
+SodaLayer::SodaLayer (int width_, int height_)
     : layer_width(width_),
-      layer_height(height_),
-      layer_pixelSize(pixelSize_)
+      layer_height(height_)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -44,7 +43,7 @@ SodaLayer::SodaLayer (int width_, int height_, int pixelSize_)
 
 
     //[Constructor] You can add your own custom stuff here..
-	setSize(layer_width * layer_pixelSize, layer_height * layer_pixelSize);
+	setSize(layer_width, layer_height);
 	//Creating an Image of Width * Height and ARGB format
 	image = Image(Image::ARGB, layer_width, layer_height, true);
     //[/Constructor]
@@ -154,8 +153,8 @@ void SodaLayer::onActivation()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SodaLayer" componentName=""
-                 parentClasses="public Component" constructorParams="int width_, int height_, int pixelSize_"
-                 variableInitialisers="layer_width(width_),&#10;layer_height(height_),&#10;layer_pixelSize(pixelSize_)&#10;&#10;"
+                 parentClasses="public Component" constructorParams="int width_, int height_"
+                 variableInitialisers="layer_width(width_),&#10;layer_height(height_)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="0"/>

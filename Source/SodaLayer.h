@@ -40,7 +40,7 @@ class SodaLayer  : public Component
 {
 public:
     //==============================================================================
-    SodaLayer (int width_, int height_, int pixelSize_);
+    SodaLayer (int width_, int height_);
     ~SodaLayer();
 
     //==============================================================================
@@ -80,7 +80,6 @@ private:
 
 	int				layer_width;
 	int				layer_height;
-	int				layer_pixelSize;
 
 	Point<int>		CurrentMousePosition;
     //[/UserVariables]

@@ -16,13 +16,10 @@
 @ Soda Playback Enum Class
 @ Used to identify the current playback
 */
-enum class ESodaPlayback
+enum ESodaPlayback
 {
-	Pause,
-	ForwardPlay,
-	ReversePlay,
-	//NextFrame,
-	//PreviousFrame,
+	Playback_Playing	= 0x1,
+	Playback_Reversed	= 0x2,
 };
 
 class FSodaBrush;
@@ -40,12 +37,36 @@ struct FSodaProperties
 		, image(nullptr)
 		, brush(nullptr)
 		, isGridVisible(true)
+		, pixelSize(10)
 	{}
 	
 	Colour brushColour;
+
 	int brushSize;
+
+	/*
+	Pointer to the Current Image being drawn.
+	This is the image that the SodaLayer class wraps around.
+	*/
 	Image* image;
+
+
+	/*
+	Pointer to the Current brush.
+	This allows us to make even more types of brush without editing anything.
+	*/
 	FSodaBrush* brush;
+
+	/*
+	the Size of the Pixels of the Canvas that is drawn into the Window.
+	We can think of it as the 'Zoom' of the Canvas
+	or ratio of the real pixels to the Sprite Pixel
+	*/
+	int pixelSize;
+
+	/* 
+	Flag whether to draw the Grid or not (true to draw)
+	*/
 	bool isGridVisible;
 };
 

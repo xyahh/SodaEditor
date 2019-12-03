@@ -33,9 +33,7 @@ SodaCanvas::SodaCanvas ()
     //[Constructor_pre] You can add your own custom stuff here..
 
 	//set pixel size 10 as default.
-	pixelSize = 10;
 	resolution = 64; //64x64 resolution
-	
     //[/Constructor_pre]
 
 
@@ -46,9 +44,15 @@ SodaCanvas::SodaCanvas ()
 
 
     //[Constructor] You can add your own custom stuff here..
+	//reset playback settings to 0
+	playbackSettings = 0;
 		//for now only have one layer at init time
 	createLayer();
-	setFramesPerSecond(60); //match these two
+
+	canvasUpdateFPS = 60;
+	setFramesPerSecond(canvasUpdateFPS);
+	playbackFPS = 5;
+
 	setWantsKeyboardFocus(true);
 
     //[/Constructor]
@@ -75,7 +79,9 @@ void SodaCanvas::paint (Graphics& g)
 
 	//want to have the feeling of pixel drawing. prevent from one pixel to be influenced by other pixel colours.
 	g.setImageResamplingQuality(Graphics::ResamplingQuality::lowResamplingQuality);
-	g.fillCheckerBoard({ 0.f, 0.f, (float)getWidth(), (float)getHeight() }, pixelSize * 4.f, pixelSize * 4.f, Colour::greyLevel(0.5f), Colour::greyLevel(0.75f));
+	g.fillCheckerBoard({ 0.f, 0.f, (float)getWidth(), (float)getHeight() }
+		, gProperties.pixelSize * 4.f, gProperties.pixelSize * 4.f //draw  achecker square for every 4 pixels
+		, Colour::greyLevel(0.5f), Colour::greyLevel(0.75f));
 	/* Paint Layers in order from 0 to End.
 	@ We are not adding them as childs because they would be
 	*/
@@ -91,11 +97,11 @@ void SodaCanvas::paint (Graphics& g)
 		int layerHeight = layerBounds.getHeight();
 
 		//draw columns
-		for (int i = 0; i <= layerWidth; i += pixelSize)
+		for (int i = 0; i <= layerWidth; i += gProperties.pixelSize)
 			g.drawVerticalLine(i + layerX, layerY, layerY + layerHeight);
 
 		//draw rows
-		for (int i = 0; i <= layerHeight; i += pixelSize)
+		for (int i = 0; i <= layerHeight; i += gProperties.pixelSize)
 			g.drawHorizontalLine(i + layerY, layerX, layerX + layerWidth);
 	}
 
@@ -105,8 +111,6 @@ void SodaCanvas::paint (Graphics& g)
 void SodaCanvas::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-	int CanvasWidth = getWidth();
-	int CanvasHeight = getHeight();
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
@@ -122,7 +126,8 @@ void SodaCanvas::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
 	isDrawing = true;
-	if (layers.size() > 0)
+	//do not draw if we're playing the sprite!
+	if (layers.size() > 0 && !(playbackSettings & ESodaPlayback::Playback_Playing))
 		layers[activeLayer].startDraw(e);
 
     //[/UserCode_mouseDown]
@@ -132,7 +137,8 @@ void SodaCanvas::mouseDrag (const MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
 	isDrawing = true;
-	if (layers.size() > 0)
+	//do not draw if we're playing the sprite!
+	if (layers.size() > 0 && !(playbackSettings & ESodaPlayback::Playback_Playing))
 		layers[activeLayer].updateMousePos(e);
 
     //[/UserCode_mouseDrag]
@@ -143,7 +149,7 @@ void SodaCanvas::mouseUp (const MouseEvent& e)
     //[UserCode_mouseUp] -- Add your code here...
 
 	//end draw and get all the pixels that were drawn in the process
-	if (layers.size() > 0)
+	if (layers.size() > 0 && isDrawing)
 	{
 		std::set<FPixel> Pixels;
 		layers[activeLayer].endDraw(e, &Pixels);
@@ -159,7 +165,6 @@ void SodaCanvas::mouseUp (const MouseEvent& e)
 			);
 		}
 	}
-	
 	isDrawing = false;
 
     //[/UserCode_mouseUp]
@@ -192,21 +197,43 @@ bool SodaCanvas::keyPressed (const KeyPress& key)
     //[/UserCode_keyPressed]
 }
 
+
+
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void SodaCanvas::update()
 {
 	if (layers.size() > 0)
 		layers[activeLayer].update();
+
+	//check if we have the Playback_Playing setting ON and there's no Drawing taking place to proceed
+	if (playbackSettings & ESodaPlayback::Playback_Playing && !isDrawing)
+	{
+		// update the frames passed by the playbackFPS 
+		// (i.e. when 60 Frames have passed in update, how many shall pass in playback?)
+		updateFramesPassed += playbackFPS;
+		if (updateFramesPassed >= canvasUpdateFPS)
+		{
+			updateFramesPassed -= canvasUpdateFPS;
+			int deltaLayer = 1;
+			if (playbackSettings & ESodaPlayback::Playback_Reversed)
+			{
+				//size_t doesn't have negative so we're making 0 the layers.size() so that deltaLayer when subtracted becomes the last element
+				if (activeLayer == 0) activeLayer = layers.size();
+				deltaLayer = -1;
+			}
+
+			setActiveLayer((activeLayer + deltaLayer) % layers.size());
+		}
+	}
+	
 }
 
 size_t SodaCanvas::createLayer()
 {
-	layers.emplace_back(resolution, resolution, pixelSize);
+	layers.emplace_back(resolution, resolution);
 	size_t Index = layers.size() - 1;
 	//set bounds so that we see the layer at the center
 	setActiveLayer(Index);
-
-	//resize the layer to be at the center
 	resizeLayer(layers.back());
 
 	registerNewCommand(new FSodaCreateLayerCommand, false);
@@ -221,9 +248,19 @@ void SodaCanvas::swapLayers(size_t targetLayer, size_t otherLayer)
 {
 }
 
-void SodaCanvas::setPlayback(ESodaPlayback PlaybackType_)
+void SodaCanvas::addPlaybackSettings(int Settings)
 {
-	PlaybackType = PlaybackType_;
+	playbackSettings |= Settings;
+}
+
+void SodaCanvas::removePlaybackSettings(int Settings)
+{
+	playbackSettings &= ~Settings;
+}
+
+void SodaCanvas::setPlaybackFPS(int FPS)
+{
+	playbackFPS = FPS;
 }
 
 bool SodaCanvas::setActiveLayer(size_t index)
@@ -275,8 +312,20 @@ void SodaCanvas::resizeLayer(SodaLayer & layer)
 	layer.setBounds
 	((getWidth() / 2) - (LayerWidth / 2)
 		, (getHeight() / 2) - (LayerHeight / 2)
-		, resolution * pixelSize
-		, resolution * pixelSize);
+		, resolution * gProperties.pixelSize
+		, resolution * gProperties.pixelSize);
+
+	//second resize to get the new Width & Height
+	//after the First Layer Set Bounds
+
+	LayerWidth = layer.getWidth();
+	LayerHeight = layer.getHeight();
+
+	layer.setBounds
+	((getWidth() / 2) - (LayerWidth / 2)
+		, (getHeight() / 2) - (LayerHeight / 2)
+		, resolution * gProperties.pixelSize
+		, resolution * gProperties.pixelSize);
 }
 
 void SodaCanvas::registerNewCommand(FSodaCommand * command, bool execute)

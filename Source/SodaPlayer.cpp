@@ -50,6 +50,7 @@ SodaPlayer::SodaPlayer (SodaCanvas* canvas_)
                              Image(), 1.000f, Colours::white);
 
     //[UserPreSize]
+	sodaCanvas = canvas_;
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -103,11 +104,13 @@ void SodaPlayer::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == playButton.get())
     {
         //[UserButtonCode_playButton] -- add your button handler code here..
+		sodaCanvas->addPlaybackSettings(ESodaPlayback::Playback_Playing);
         //[/UserButtonCode_playButton]
     }
     else if (buttonThatWasClicked == revereButton.get())
     {
         //[UserButtonCode_revereButton] -- add your button handler code here..
+		sodaCanvas->addPlaybackSettings(ESodaPlayback::Playback_Reversed);
         //[/UserButtonCode_revereButton]
     }
 

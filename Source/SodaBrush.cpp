@@ -31,7 +31,7 @@ void FSodaBrush::startDraw(Image * image, const Point<float>& CurrentPixelUnderM
 
 	//asign point to latest coordinates
 	PixelUnderMouse = CurrentPixelUnderMouse;
-
+	drawPixel(image, PixelUnderMouse.x, PixelUnderMouse.y, gProperties.brushSize, gProperties.brushColour);
 	//star drawing
 	isDrawing = true;
 }
