@@ -2,12 +2,6 @@
 
 <JUCERPROJECT id="RB9Owt" name="SodaEditor" projectType="guiapp" jucerVersion="5.4.5">
   <MAINGROUP id="mNrZiT" name="SodaEditor">
-    <GROUP id="{C97AD44F-EC58-30C4-14F1-C4838DD78968}" name="Third Party">
-      <FILE id="u9OAXZ" name="DraggableListBox.cpp" compile="1" resource="0"
-            file="Source/DraggableListBox.cpp"/>
-      <FILE id="l111pB" name="DraggableListBox.h" compile="0" resource="0"
-            file="Source/DraggableListBox.h"/>
-    </GROUP>
     <GROUP id="{50CCAB3F-A3EE-F740-2A8F-D4C02EF77AAE}" name="BrushTypes">
       <FILE id="hTgkwd" name="SodaBrush.cpp" compile="1" resource="0" file="Source/SodaBrush.cpp"/>
       <FILE id="TJ9i2X" name="SodaBrush.h" compile="0" resource="0" file="Source/SodaBrush.h"/>

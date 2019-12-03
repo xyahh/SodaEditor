@@ -35,7 +35,8 @@
                                                                     //[/Comments]
 */
 class SodaRibbon  : public Component,
-                    public Button::Listener
+                    public Button::Listener,
+                    public Slider::Listener
 {
 public:
     //==============================================================================
@@ -49,6 +50,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
     // Binary resources:
     static const char* saveIcon_png;
@@ -75,6 +77,7 @@ private:
     std::unique_ptr<ImageButton> openButton;
     std::unique_ptr<ImageButton> undoButton;
     std::unique_ptr<ImageButton> redoButton;
+    std::unique_ptr<Slider> pixelSlider;
 
 
     //==============================================================================

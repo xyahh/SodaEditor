@@ -68,6 +68,13 @@ SodaRibbon::SodaRibbon (SodaCanvas* canvas_)
                            ImageCache::getFromMemory (redoIcon_png, redoIcon_pngSize), 1.000f, Colour (0x00000000),
                            Image(), 0.800f, Colour (0x88383838),
                            Image(), 1.000f, Colour (0x88373737));
+    pixelSlider.reset (new Slider ("pixelSlider"));
+    addAndMakeVisible (pixelSlider.get());
+    pixelSlider->setRange (1, 16, 1);
+    pixelSlider->setSliderStyle (Slider::LinearHorizontal);
+    pixelSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    pixelSlider->addListener (this);
+
 
     //[UserPreSize]
 	canvas = canvas_;
@@ -77,6 +84,7 @@ SodaRibbon::SodaRibbon (SodaCanvas* canvas_)
 
 
     //[Constructor] You can add your own custom stuff here..
+	pixelSlider->setValue(static_cast<double>(gProperties.pixelSize));
     //[/Constructor]
 }
 
@@ -89,6 +97,7 @@ SodaRibbon::~SodaRibbon()
     openButton = nullptr;
     undoButton = nullptr;
     redoButton = nullptr;
+    pixelSlider = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -116,6 +125,7 @@ void SodaRibbon::resized()
     openButton->setBounds (130, (getHeight() / 2) - (80 / 2), 80, 80);
     undoButton->setBounds (230, (getHeight() / 2) - (80 / 2), 80, 80);
     redoButton->setBounds (330, (getHeight() / 2) - (80 / 2), 80, 80);
+    pixelSlider->setBounds (getWidth() - 30 - 200, (getHeight() / 2) - (40 / 2), 200, 40);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -152,6 +162,23 @@ void SodaRibbon::buttonClicked (Button* buttonThatWasClicked)
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
+}
+
+void SodaRibbon::sliderValueChanged (Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == pixelSlider.get())
+    {
+        //[UserSliderCode_pixelSlider] -- add your slider handling code here..
+		gProperties.pixelSize = static_cast<int>(pixelSlider->getValue());
+		canvas->resized();
+        //[/UserSliderCode_pixelSlider]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
 }
 
 
@@ -202,6 +229,11 @@ BEGIN_JUCER_METADATA
                keepProportions="1" resourceNormal="redoIcon_png" opacityNormal="1.0"
                colourNormal="0" resourceOver="" opacityOver="0.800000011920929"
                colourOver="88383838" resourceDown="" opacityDown="1.0" colourDown="88373737"/>
+  <SLIDER name="pixelSlider" id="fb0fb2b7b79bfcf5" memberName="pixelSlider"
+          virtualName="" explicitFocusOrder="0" pos="30Rr 0Cc 200 40" min="1.0"
+          max="16.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

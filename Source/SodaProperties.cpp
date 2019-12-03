@@ -34,24 +34,24 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+    canvasGroup.reset (new GroupComponent ("canvasGroup",
+                                           TRANS("Canvas")));
+    addAndMakeVisible (canvasGroup.get());
+
     brushGroup.reset (new GroupComponent ("brushGroup",
                                           TRANS("Brush")));
     addAndMakeVisible (brushGroup.get());
     brushGroup->setTextLabelPosition (Justification::centredLeft);
 
-    canvasGroup.reset (new GroupComponent ("canvasGroup",
-                                           TRANS("Canvas")));
-    addAndMakeVisible (canvasGroup.get());
+    brushTypeGroup.reset (new GroupComponent ("brushTypeGroup",
+                                              TRANS("Brush Types")));
+    addAndMakeVisible (brushTypeGroup.get());
+    brushTypeGroup->setTextLabelPosition (Justification::centredLeft);
 
     paletteButton.reset (new TextButton ("paletteButton"));
     addAndMakeVisible (paletteButton.get());
     paletteButton->setButtonText (TRANS("Palette"));
     paletteButton->addListener (this);
-
-    brushTypeGroup.reset (new GroupComponent ("brushTypeGroup",
-                                              TRANS("Brush Types")));
-    addAndMakeVisible (brushTypeGroup.get());
-    brushTypeGroup->setTextLabelPosition (Justification::centredLeft);
 
     label.reset (new Label ("new label",
                             TRANS("Brush\n"
@@ -137,7 +137,6 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
 		paletteButton->setColour(TextButton::buttonColourId, gProperties.brushColour);
 		brushSlider->setValue(static_cast<double>(gProperties.brushSize));
 		pixelScaleSlider->setValue(static_cast<double>(gProperties.pixelSize));
-
 		//lambda to init all the style brushes
 		auto InitStyleButtons = [](ImageButton* button) {
 			button->setClickingTogglesState(true);
@@ -173,10 +172,10 @@ SodaProperties::~SodaProperties()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    brushGroup = nullptr;
     canvasGroup = nullptr;
-    paletteButton = nullptr;
+    brushGroup = nullptr;
     brushTypeGroup = nullptr;
+    paletteButton = nullptr;
     label = nullptr;
     freeStyle = nullptr;
     circleStyle = nullptr;
@@ -201,6 +200,8 @@ void SodaProperties::paint (Graphics& g)
     g.fillAll (Colours::grey);
 
     //[UserPaint] Add your own custom painting code here..
+	g.setColour(Colours::red);
+	g.fillRect(pixelScaleSlider.get()->getBounds().toFloat());
     //[/UserPaint]
 }
 
@@ -209,20 +210,22 @@ void SodaProperties::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
+    canvasGroup->setBounds (0, 512, proportionOfWidth (1.0000f), getHeight() - 510);
     brushGroup->setBounds (0, 0, proportionOfWidth (1.0000f), 250);
-    canvasGroup->setBounds (0, 500, proportionOfWidth (1.0000f), getHeight() - 320);
-    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
     brushTypeGroup->setBounds (0, 250, proportionOfWidth (1.0000f), 250);
-    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 20, 150, 50);
-    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3002f), 25);
-    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3002f), 250 + 45, proportionOfWidth (0.3002f), 25);
-    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
-    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3002f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
-    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
-    label2->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -100 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2)) + -886, (500 + -500) + 0, 0, 0);
-    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
-    pixelScaleSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -100 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2), 500 + -500, roundToInt (proportionOfWidth (1.0000f) * 0.0000f), 0);
+    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
+    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 0, 150, 50);
+    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3000f), 25);
+    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3000f), 250 + 45, proportionOfWidth (0.3000f), 25);
+    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
+    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3000f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
+    eraserStyle->setBounds (0 + 40, 250 + 134, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
+    label2->setBounds ((0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2)) + -100, (512 + -9) + -503, 0, 0);
+    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
+    pixelScaleSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2), 512 + -9, roundToInt (proportionOfWidth (1.0000f) * 0.0000f), 0);
     //[UserResized] Add your own custom resize handling here..
+
+
     //[/UserResized]
 }
 
@@ -352,82 +355,80 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SodaProperties" componentName=""
                  parentClasses="public Component, public ChangeListener" constructorParams="SodaCanvas* canvas_"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
+                 variableInitialisers="" snapPixels="32" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="1000">
   <BACKGROUND backgroundColour="ff808080"/>
+  <GROUPCOMPONENT name="canvasGroup" id="19d55f7d8fa371b" memberName="canvasGroup"
+                  virtualName="" explicitFocusOrder="0" pos="0 512 100% 510M" title="Canvas"/>
   <GROUPCOMPONENT name="brushGroup" id="2c65e22a40bc686b" memberName="brushGroup"
                   virtualName="" explicitFocusOrder="0" pos="0 0 100% 250" title="Brush"
                   textpos="33"/>
-  <GROUPCOMPONENT name="canvasGroup" id="19d55f7d8fa371b" memberName="canvasGroup"
-                  virtualName="" explicitFocusOrder="0" pos="0 500 100% 320M" title="Canvas"/>
-  <TEXTBUTTON name="paletteButton" id="2e78eaf6e5c8fc8a" memberName="paletteButton"
-              virtualName="" explicitFocusOrder="0" pos="-0.5Cc 30 74.92% 24"
-              posRelativeX="2c65e22a40bc686b" posRelativeW="2c65e22a40bc686b"
-              posRelativeH="2c65e22a40bc686b" buttonText="Palette" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="brushTypeGroup" id="ddc968defcd189da" memberName="brushTypeGroup"
                   virtualName="" explicitFocusOrder="0" pos="0 250 100% 250" title="Brush Types"
                   textpos="33"/>
+  <TEXTBUTTON name="paletteButton" id="2e78eaf6e5c8fc8a" memberName="paletteButton"
+              virtualName="" explicitFocusOrder="0" pos="-0.5Cc 30 75% 24"
+              posRelativeX="2c65e22a40bc686b" posRelativeW="2c65e22a40bc686b"
+              posRelativeH="2c65e22a40bc686b" buttonText="Palette" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
   <LABEL name="new label" id="3b1a81302236db98" memberName="label" virtualName=""
-         explicitFocusOrder="0" pos="0 20 150 50" posRelativeX="aba3384d7b3a6f33"
+         explicitFocusOrder="0" pos="0 0 150 50" posRelativeX="aba3384d7b3a6f33"
          posRelativeY="aba3384d7b3a6f33" edTextCol="ff000000" edBkgCol="0"
          labelText="Brush&#10;Size" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <IMAGEBUTTON name="freeStyle" id="e6e983f2e1ad1b5e" memberName="freeStyle"
-               virtualName="" explicitFocusOrder="1" pos="30 45 29.904% 25"
-               posRelativeY="ddc968defcd189da" buttonText="freeStyle" connectedEdges="0"
-               needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="freeDrawIcon_png"
-               opacityNormal="1.0" colourNormal="ff373737" resourceOver="" opacityOver="1.0"
-               colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
+               virtualName="" explicitFocusOrder="1" pos="30 45 30.02% 25" posRelativeY="ddc968defcd189da"
+               buttonText="freeStyle" connectedEdges="0" needsCallback="1" radioGroupId="0"
+               keepProportions="1" resourceNormal="freeDrawIcon_png" opacityNormal="1.0"
+               colourNormal="ff373737" resourceOver="" opacityOver="1.0" colourOver="ffffffff"
+               resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <IMAGEBUTTON name="circleStyle" id="26c8cbacc97baa41" memberName="circleStyle"
-               virtualName="" explicitFocusOrder="0" pos="30Rr 45 29.904% 25"
+               virtualName="" explicitFocusOrder="0" pos="30Rr 45 30.02% 25"
                posRelativeX="ddc968defcd189da" posRelativeY="ddc968defcd189da"
                buttonText="circleStyle" connectedEdges="0" needsCallback="1"
                radioGroupId="0" keepProportions="1" resourceNormal="circleIcon_png"
                opacityNormal="1.0" colourNormal="ff373737" resourceOver="" opacityOver="1.0"
                colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <IMAGEBUTTON name="lineStyle" id="40b15349cbc849bf" memberName="lineStyle"
-               virtualName="" explicitFocusOrder="0" pos="30 90 29.904% 24"
-               posRelativeY="ddc968defcd189da" posRelativeW="ddc968defcd189da"
-               buttonText="lineStyle" connectedEdges="0" needsCallback="1" radioGroupId="0"
-               keepProportions="1" resourceNormal="lineIcon_png" opacityNormal="1.0"
-               colourNormal="ff353535" resourceOver="" opacityOver="1.0" colourOver="ffffffff"
-               resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
+               virtualName="" explicitFocusOrder="0" pos="30 90 30.02% 24" posRelativeY="ddc968defcd189da"
+               posRelativeW="ddc968defcd189da" buttonText="lineStyle" connectedEdges="0"
+               needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="lineIcon_png"
+               opacityNormal="1.0" colourNormal="ff353535" resourceOver="" opacityOver="1.0"
+               colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <IMAGEBUTTON name="rectStyle" id="3c372454deeff6f" memberName="rectStyle"
-               virtualName="" explicitFocusOrder="0" pos="30Rr 90 29.904% 24"
+               virtualName="" explicitFocusOrder="0" pos="30Rr 90 30.02% 24"
                posRelativeX="ddc968defcd189da" posRelativeY="ddc968defcd189da"
                posRelativeW="ddc968defcd189da" buttonText="rectStyle" connectedEdges="0"
                needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="rectIcon_png"
                opacityNormal="1.0" colourNormal="ff353535" resourceOver="" opacityOver="1.0"
                colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <IMAGEBUTTON name="eraserStyle" id="2ee25b0fdb2cf3c2" memberName="eraserStyle"
-               virtualName="" explicitFocusOrder="0" pos="30 135 29.904% 24"
+               virtualName="" explicitFocusOrder="0" pos="40 134 30.02% 24"
                posRelativeX="ddc968defcd189da" posRelativeY="ddc968defcd189da"
                posRelativeW="ddc968defcd189da" buttonText="eraserStyle" connectedEdges="0"
                needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="eraserIcon_png"
                opacityNormal="1.0" colourNormal="ff353535" resourceOver="" opacityOver="1.0"
                colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <LABEL name="new label" id="c96b68f3b8cabcf7" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="-55 0 0 0" posRelativeX="c3647bef6f394e22"
+         explicitFocusOrder="0" pos="-986 -503 0 0" posRelativeX="c3647bef6f394e22"
          posRelativeY="c3647bef6f394e22" posRelativeW="c3647bef6f394e22"
          edTextCol="ff000000" edBkgCol="0" labelText="Pixel&#10;Scale"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
          italic="0" justification="33"/>
   <SLIDER name="brushSlider" id="aba3384d7b3a6f33" memberName="brushSlider"
-          virtualName="" explicitFocusOrder="0" pos="-0.5Cc 75 74.92% 150"
+          virtualName="" explicitFocusOrder="0" pos="-0.5Cc 75 75% 150"
           posRelativeX="2c65e22a40bc686b" posRelativeY="2c65e22a40bc686b"
           posRelativeW="2c65e22a40bc686b" min="1.0" max="25.0" int="1.0"
           style="LinearVertical" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <SLIDER name="pixelScaleSlider" id="c3647bef6f394e22" memberName="pixelScaleSlider"
-          virtualName="" explicitFocusOrder="0" pos="-100Cc -500 0% 0"
-          posRelativeX="19d55f7d8fa371b" posRelativeY="19d55f7d8fa371b"
-          posRelativeW="19d55f7d8fa371b" posRelativeH="19d55f7d8fa371b"
-          min="1.0" max="16.0" int="1.0" style="LinearVertical" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          virtualName="" explicitFocusOrder="0" pos="0Cc -9 0% 0" posRelativeX="19d55f7d8fa371b"
+          posRelativeY="19d55f7d8fa371b" posRelativeW="19d55f7d8fa371b"
+          posRelativeH="19d55f7d8fa371b" min="1.0" max="16.0" int="1.0"
+          style="LinearVertical" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

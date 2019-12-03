@@ -76,10 +76,10 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> brushGroup;
     std::unique_ptr<GroupComponent> canvasGroup;
-    std::unique_ptr<TextButton> paletteButton;
+    std::unique_ptr<GroupComponent> brushGroup;
     std::unique_ptr<GroupComponent> brushTypeGroup;
+    std::unique_ptr<TextButton> paletteButton;
     std::unique_ptr<Label> label;
     std::unique_ptr<ImageButton> freeStyle;
     std::unique_ptr<ImageButton> circleStyle;

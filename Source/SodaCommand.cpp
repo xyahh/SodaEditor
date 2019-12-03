@@ -122,24 +122,3 @@ bool FSodaActivateLayerCommand::undo(SodaCanvas * canvas)
 	if (!canvas) return false;
 	return canvas->setActiveLayer_Internal(prev_id);
 }
-
-
-/*
-==============================================================================
-Swap Layer Command
-==============================================================================
-*/
-
-
-bool FSodaMoveLayerCommand::execute(SodaCanvas * canvas)
-{
-	if (!canvas) return false;
-	return canvas->moveLayer_Internal(target, destination, placeBeforeDestination);
-}
-
-bool FSodaMoveLayerCommand::undo(SodaCanvas * canvas)
-{
-	//Swapping Layers from A<->B and back is the same process so
-	//we just call execute
-	return execute(canvas);
-}
