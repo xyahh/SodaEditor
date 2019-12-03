@@ -185,7 +185,7 @@ private:
 
 
 	int canvasUpdateFPS;
-	
+
 	int updateFramesPassed;
 	int playbackFPS;
 

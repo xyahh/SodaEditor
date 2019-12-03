@@ -157,6 +157,8 @@ public:
 
 	virtual ~FSodaEraserBrush() {}
 
+	virtual void startDraw(Image* image, const Point<float>& CurrentPixelUnderMouse);
+
 	virtual void updateDraw(Image* image, const Point<float>& CurrentPixelUnderMouse);
 };
 

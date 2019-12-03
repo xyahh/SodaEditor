@@ -57,16 +57,20 @@ public:
     static const int reverseIcon_pngSize;
     static const char* playIcon_png2;
     static const int playIcon_png2Size;
+    static const char* pauseIcon_png;
+    static const int pauseIcon_pngSize;
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	SodaCanvas* sodaCanvas;
+	bool		isReversed;
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<ImageButton> playButton;
-    std::unique_ptr<ImageButton> revereButton;
+    std::unique_ptr<ImageButton> reverseButton;
+    std::unique_ptr<ImageButton> pauseButton;
 
 
     //==============================================================================

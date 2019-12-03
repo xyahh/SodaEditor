@@ -208,7 +208,7 @@ void SodaCanvas::update()
 	//check if we have the Playback_Playing setting ON and there's no Drawing taking place to proceed
 	if (playbackSettings & ESodaPlayback::Playback_Playing && !isDrawing)
 	{
-		// update the frames passed by the playbackFPS 
+		// update the frames passed by the playbackFPS
 		// (i.e. when 60 Frames have passed in update, how many shall pass in playback?)
 		updateFramesPassed += playbackFPS;
 		if (updateFramesPassed >= canvasUpdateFPS)
@@ -225,7 +225,7 @@ void SodaCanvas::update()
 			setActiveLayer((activeLayer + deltaLayer) % layers.size());
 		}
 	}
-	
+
 }
 
 size_t SodaCanvas::createLayer()

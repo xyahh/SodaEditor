@@ -10,6 +10,13 @@
 
 #include "SodaBrush.h"
 
+void FSodaEraserBrush::startDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)
+{
+	FSodaBrush::startDraw(image, CurrentPixelUnderMouse);
+	drawPixel(image, PixelUnderMouse.x, PixelUnderMouse.y, gProperties.brushSize, Colours::transparentBlack);
+
+}
+
 void FSodaEraserBrush::updateDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)
 {
 	//save current PixelUndermouse to a variable so that we can know the prev value after it changes 
