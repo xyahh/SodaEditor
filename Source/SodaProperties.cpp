@@ -34,10 +34,6 @@ SodaProperties::SodaProperties (SodaCanvas* canvas_)
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    canvasGroup.reset (new GroupComponent ("canvasGroup",
-                                           TRANS("Canvas")));
-    addAndMakeVisible (canvasGroup.get());
-
     brushGroup.reset (new GroupComponent ("brushGroup",
                                           TRANS("Brush")));
     addAndMakeVisible (brushGroup.get());
@@ -172,7 +168,6 @@ SodaProperties::~SodaProperties()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    canvasGroup = nullptr;
     brushGroup = nullptr;
     brushTypeGroup = nullptr;
     paletteButton = nullptr;
@@ -210,19 +205,18 @@ void SodaProperties::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    canvasGroup->setBounds (0, 512, proportionOfWidth (1.0000f), getHeight() - 350);
     brushGroup->setBounds (0, 0, proportionOfWidth (1.0000f), 250);
     brushTypeGroup->setBounds (0, 250, proportionOfWidth (1.0000f), 250);
-    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
-    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 0, 150, 50);
-    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3000f), 25);
-    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3000f), 250 + 45, proportionOfWidth (0.3000f), 25);
-    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3000f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    eraserStyle->setBounds (0 + 40, 250 + 134, roundToInt (proportionOfWidth (1.0000f) * 0.3000f), 24);
-    label2->setBounds ((0 + proportionOfWidth (1.0000f) / 2 + -100 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2)) + 0, (512 + -512) + 0, 0, 0);
-    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -1 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
-    pixelScaleSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 + -100 - ((roundToInt (proportionOfWidth (1.0000f) * 0.0000f)) / 2), 512 + -512, roundToInt (proportionOfWidth (1.0000f) * 0.0000f), 0);
+    paletteButton->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 30, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 24);
+    label->setBounds ((0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2)) + 0, (0 + 75) + 0, 150, 50);
+    freeStyle->setBounds (30, 250 + 45, proportionOfWidth (0.3002f), 25);
+    circleStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - proportionOfWidth (0.3002f), 250 + 45, proportionOfWidth (0.3002f), 25);
+    lineStyle->setBounds (30, 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    rectStyle->setBounds (0 + proportionOfWidth (1.0000f) - 30 - (roundToInt (proportionOfWidth (1.0000f) * 0.3002f)), 250 + 90, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    eraserStyle->setBounds (0 + 30, 250 + 135, roundToInt (proportionOfWidth (1.0000f) * 0.3002f), 24);
+    label2->setBounds (((getWidth() / 2) + -100 - (proportionOfWidth (0.0000f) / 2)) + -886, (-512) + 512, 0, 0);
+    brushSlider->setBounds (0 + proportionOfWidth (1.0000f) / 2 - ((roundToInt (proportionOfWidth (1.0000f) * 0.7500f)) / 2), 0 + 75, roundToInt (proportionOfWidth (1.0000f) * 0.7500f), 150);
+    pixelScaleSlider->setBounds ((getWidth() / 2) + -100 - (proportionOfWidth (0.0000f) / 2), -512, proportionOfWidth (0.0000f), 0);
     //[UserResized] Add your own custom resize handling here..
 
 
@@ -358,8 +352,6 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="" snapPixels="32" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="1000">
   <BACKGROUND backgroundColour="ff808080"/>
-  <GROUPCOMPONENT name="canvasGroup" id="19d55f7d8fa371b" memberName="canvasGroup"
-                  virtualName="" explicitFocusOrder="0" pos="0 512 100% 320M" title="Canvas"/>
   <GROUPCOMPONENT name="brushGroup" id="2c65e22a40bc686b" memberName="brushGroup"
                   virtualName="" explicitFocusOrder="0" pos="0 0 100% 250" title="Brush"
                   textpos="33"/>
@@ -402,14 +394,14 @@ BEGIN_JUCER_METADATA
                colourNormal="ff353535" resourceOver="" opacityOver="1.0" colourOver="ffffffff"
                resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <IMAGEBUTTON name="eraserStyle" id="2ee25b0fdb2cf3c2" memberName="eraserStyle"
-               virtualName="" explicitFocusOrder="0" pos="40 134 30% 24" posRelativeX="ddc968defcd189da"
+               virtualName="" explicitFocusOrder="0" pos="30 135 30% 24" posRelativeX="ddc968defcd189da"
                posRelativeY="ddc968defcd189da" posRelativeW="ddc968defcd189da"
                buttonText="eraserStyle" connectedEdges="0" needsCallback="1"
                radioGroupId="0" keepProportions="1" resourceNormal="eraserIcon_png"
                opacityNormal="1.0" colourNormal="ff353535" resourceOver="" opacityOver="1.0"
                colourOver="ffffffff" resourceDown="" opacityDown="1.0" colourDown="ffffffff"/>
   <LABEL name="new label" id="c96b68f3b8cabcf7" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="0 0 0 0" posRelativeX="c3647bef6f394e22"
+         explicitFocusOrder="0" pos="0 512 0 0" posRelativeX="c3647bef6f394e22"
          posRelativeY="c3647bef6f394e22" posRelativeW="c3647bef6f394e22"
          edTextCol="ff000000" edBkgCol="0" labelText="Pixel&#10;Scale"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"

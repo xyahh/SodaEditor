@@ -117,7 +117,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="1280" initialHeight="720">
   <BACKGROUND backgroundColour="ff000000"/>
   <JUCERCOMP name="canvas" id="ad4cb210cd9dda24" memberName="sodaCanvas" virtualName="SodaCanvas"
-             explicitFocusOrder="0" pos="210 110 211M 220M" sourceFile="SodaCanvas.cpp"
+             explicitFocusOrder="0" pos="210 110 520M 220M" sourceFile="SodaCanvas.cpp"
              constructorParams=""/>
   <JUCERCOMP name="" id="66495e275da159db" memberName="ribbonComponent" virtualName=""
              explicitFocusOrder="0" pos="0 0 100% 100" sourceFile="SodaRibbon.cpp"
@@ -126,7 +126,7 @@ BEGIN_JUCER_METADATA
              explicitFocusOrder="0" pos="0Rr 0Rr 300 100M" sourceFile="SodaToolbox.cpp"
              constructorParams="sodaCanvas.get()"/>
   <JUCERCOMP name="" id="abe5338cd2654eaa" memberName="playerComponent" virtualName=""
-             explicitFocusOrder="0" pos="200 0Rr 211M 100" sourceFile="SodaPlayer.cpp"
+             explicitFocusOrder="0" pos="200 0Rr 500M 100" sourceFile="SodaPlayer.cpp"
              constructorParams="sodaCanvas.get()"/>
   <JUCERCOMP name="" id="4fdb46b971893e" memberName="propertiesComponent"
              virtualName="" explicitFocusOrder="0" pos="0 0Rr 200 100M" sourceFile="SodaProperties.cpp"

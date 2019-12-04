@@ -84,6 +84,7 @@ private:
     std::unique_ptr<ImageButton> undoButton;
     std::unique_ptr<ImageButton> redoButton;
     std::unique_ptr<Slider> pixelSlider;
+    std::unique_ptr<Label> label;
 
 
     //==============================================================================

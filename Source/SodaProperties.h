@@ -76,7 +76,6 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> canvasGroup;
     std::unique_ptr<GroupComponent> brushGroup;
     std::unique_ptr<GroupComponent> brushTypeGroup;
     std::unique_ptr<TextButton> paletteButton;

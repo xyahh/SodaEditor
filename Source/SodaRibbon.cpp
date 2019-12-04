@@ -75,6 +75,15 @@ SodaRibbon::SodaRibbon (SodaCanvas* canvas_)
     pixelSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     pixelSlider->addListener (this);
 
+    label.reset (new Label ("new label",
+                            TRANS("Soda Editor by Juan Marcelo Portillo")));
+    addAndMakeVisible (label.get());
+    label->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    label->setJustificationType (Justification::centred);
+    label->setEditable (false, false, false);
+    label->setColour (TextEditor::textColourId, Colours::black);
+    label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
 	canvas = canvas_;
@@ -98,6 +107,7 @@ SodaRibbon::~SodaRibbon()
     undoButton = nullptr;
     redoButton = nullptr;
     pixelSlider = nullptr;
+    label = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -126,6 +136,7 @@ void SodaRibbon::resized()
     undoButton->setBounds (230, (getHeight() / 2) - (80 / 2), 80, 80);
     redoButton->setBounds (330, (getHeight() / 2) - (80 / 2), 80, 80);
     pixelSlider->setBounds (getWidth() - 30 - 200, (getHeight() / 2) - (40 / 2), 200, 40);
+    label->setBounds ((getWidth() / 2) - (250 / 2), (getHeight() / 2) - (24 / 2), 250, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -265,6 +276,12 @@ BEGIN_JUCER_METADATA
           max="16.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
+  <LABEL name="new label" id="72f61710d2200337" memberName="label" virtualName=""
+         explicitFocusOrder="0" pos="0Cc 0Cc 250 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Soda Editor by Juan Marcelo Portillo"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
+         italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
