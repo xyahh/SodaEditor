@@ -205,12 +205,12 @@ void SodaRibbon::filenameComponentChanged(FilenameComponent * fileComponentThatH
 		Image image = ImageFileFormat::loadFrom(fileLoader->getCurrentFile());
 		if (image.isValid())
 			canvas->createLayer(image);
-	} 
+	}
 	if (fileSaver == fileComponentThatHasChanged)
 	{
 		canvas->saveCanvasToFile(fileSaver->getCurrentFile(), true);
 	}
-	
+
 
 }
 

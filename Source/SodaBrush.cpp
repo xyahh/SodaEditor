@@ -23,6 +23,7 @@ void FSodaBrush::resetPixels(Image* image)
 	//set the old color of the pixel
 	for (auto& pixel : Pixels)
 		image->setPixelAt(pixel.x, pixel.y, pixel.oldColour);
+	Pixels.clear();
 }
 
 void FSodaBrush::startDraw(Image * image, const Point<float>& CurrentPixelUnderMouse)

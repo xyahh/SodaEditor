@@ -359,7 +359,7 @@ BEGIN_JUCER_METADATA
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="1000">
   <BACKGROUND backgroundColour="ff808080"/>
   <GROUPCOMPONENT name="canvasGroup" id="19d55f7d8fa371b" memberName="canvasGroup"
-                  virtualName="" explicitFocusOrder="0" pos="0 512 100% 350M" title="Canvas"/>
+                  virtualName="" explicitFocusOrder="0" pos="0 512 100% 320M" title="Canvas"/>
   <GROUPCOMPONENT name="brushGroup" id="2c65e22a40bc686b" memberName="brushGroup"
                   virtualName="" explicitFocusOrder="0" pos="0 0 100% 250" title="Brush"
                   textpos="33"/>
