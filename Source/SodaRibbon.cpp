@@ -138,17 +138,24 @@ void SodaRibbon::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == saveButton.get())
     {
         //[UserButtonCode_saveButton] -- add your button handler code here..
+		fileSaver = new FilenameComponent("fileSaverComp", {}, false, false, true, "*.png", {}, "Select directory to save the image(s) to.");
+
+		fileSaver->addListener(this);
+		fileSaver->setSize(80, 80);
+
+		CallOutBox::launchAsynchronously(fileSaver, saveButton->getScreenBounds(), nullptr);
+
         //[/UserButtonCode_saveButton]
     }
     else if (buttonThatWasClicked == openButton.get())
     {
         //[UserButtonCode_openButton] -- add your button handler code here..
-		auto* fc = new FilenameComponent("fileComp",
+			fileLoader = new FilenameComponent("fileLoaderComp",
 			{},
 			false, false, false, "*.png", {}, "Select image to open");
-			fc->addListener(this);
-			fc->setSize(80, 80);
-			CallOutBox::launchAsynchronously(fc, openButton->getScreenBounds(), nullptr);
+			fileLoader->addListener(this);
+			fileLoader->setSize(80, 80);
+			CallOutBox::launchAsynchronously(fileLoader, openButton->getScreenBounds(), nullptr);
         //[/UserButtonCode_openButton]
     }
     else if (buttonThatWasClicked == undoButton.get())
@@ -193,9 +200,17 @@ void SodaRibbon::sliderValueChanged (Slider* sliderThatWasMoved)
 
 void SodaRibbon::filenameComponentChanged(FilenameComponent * fileComponentThatHasChanged)
 {
-	Image image = ImageFileFormat::loadFrom(fileComponentThatHasChanged->getCurrentFile());
-	if (image.isValid())
-		canvas->createLayer(image);
+	if (fileLoader == fileComponentThatHasChanged)
+	{
+		Image image = ImageFileFormat::loadFrom(fileLoader->getCurrentFile());
+		if (image.isValid())
+			canvas->createLayer(image);
+	} 
+	if (fileSaver == fileComponentThatHasChanged)
+	{
+		canvas->saveCanvasToFile(fileSaver->getCurrentFile(), true);
+	}
+	
 
 }
 

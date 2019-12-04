@@ -534,18 +534,19 @@ bool SodaCanvas::setActiveLayer_Internal(size_t id)
 	return setActiveLayerIndex_Internal(index);
 }
 
-void SodaCanvas::saveCanvasToFile(const String & filename, bool layerPerFile)
+void SodaCanvas::saveCanvasToFile(const File& file, bool layerPerFile)
 {
-	//if (!layerPerFile)
-	//{
-	//
-	//
-	//
-	//	FileOutputStream stream(File(filename));
-	//	PNGImageFormat pngWriter;
-	//
-	//
-	//}
+	String filename = file.getFullPathName();
+	String filetype = file.getFileExtension();
+	filename = filename.dropLastCharacters(filetype.length());
+
+	PNGImageFormat pngWriter;
+	int index = 0;
+	for (auto& i : layers)
+	{
+		FileOutputStream outStream(File(filename + String(index++) + filetype));
+		pngWriter.writeImageToStream(*i->getLayerImage(), outStream);
+	}
 }
 
 

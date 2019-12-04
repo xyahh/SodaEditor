@@ -174,7 +174,7 @@ public:
 	@layerPerFile: if to save  1 layer per file or to save all of the
 	layers in one single grid.
 	*/
-	void saveCanvasToFile(const String& filename, bool layerPerFile);
+	void saveCanvasToFile(const File& file, bool layerPerFile);
 
     //[/UserMethods]
 

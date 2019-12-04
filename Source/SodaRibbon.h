@@ -73,6 +73,8 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	SodaCanvas* canvas;
 
+	FilenameComponent* fileLoader;
+	FilenameComponent* fileSaver;
 
     //[/UserVariables]
 
