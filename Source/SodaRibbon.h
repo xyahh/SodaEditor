@@ -35,6 +35,7 @@
                                                                     //[/Comments]
 */
 class SodaRibbon  : public Component,
+                    public FilenameComponentListener,
                     public Button::Listener,
                     public Slider::Listener
 {
@@ -45,6 +46,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	void filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -70,6 +72,8 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	SodaCanvas* canvas;
+
+
     //[/UserVariables]
 
     //==============================================================================

@@ -47,7 +47,7 @@ SodaWindow::SodaWindow ()
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (1920, 1080);
+    setSize (1280, 720);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -114,7 +114,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="SodaWindow" componentName=""
                  parentClasses="public Component" constructorParams="" variableInitialisers=""
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="1920" initialHeight="1080">
+                 fixedSize="0" initialWidth="1280" initialHeight="720">
   <BACKGROUND backgroundColour="ff000000"/>
   <JUCERCOMP name="canvas" id="ad4cb210cd9dda24" memberName="sodaCanvas" virtualName="SodaCanvas"
              explicitFocusOrder="0" pos="210 110 520M 220M" sourceFile="SodaCanvas.cpp"

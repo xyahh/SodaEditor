@@ -59,6 +59,8 @@ public:
     static const int playIcon_png2Size;
     static const char* pauseIcon_png;
     static const int pauseIcon_pngSize;
+    static const char* reverseIcon_png2;
+    static const int reverseIcon_png2Size;
 
 
 private:

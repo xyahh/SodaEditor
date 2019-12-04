@@ -48,7 +48,7 @@ SodaCanvas::SodaCanvas ()
 	playbackSettings = 0;
 	//for now only have one layer at init time. layer id = 0
 	//createLayer(0);
-	createLayer_Internal(0, nullptr);
+	createLayer_Internal(layer_id++, nullptr);
 
 	canvasUpdateFPS = 60;
 	setFramesPerSecond(canvasUpdateFPS);
@@ -247,16 +247,24 @@ void SodaCanvas::update()
 
 }
 
-bool SodaCanvas::createLayer(size_t id)
+bool SodaCanvas::createLayer()
 {
-	//create a new command and register into undo stack and execute it
 	FSodaCreateLayerCommand* pCommand;
-	pCommand = new FSodaCreateLayerCommand(id);
+	pCommand = new FSodaCreateLayerCommand(layer_id++);
+	return registerNewCommand(pCommand, true);
+}
+
+bool SodaCanvas::createLayer(const Image& image)
+{
+	FSodaCreateLayerCommand* pCommand;
+	pCommand = new FSodaCreateLayerCommand(layer_id++, image);
 	return registerNewCommand(pCommand, true);
 }
 
 bool SodaCanvas::deleteLayer(size_t id)
 {
+	//do not allow to delete if there's only 1 layer remaining
+	if (layers.size() <= 1) return false;
 	//create a new command and register into undo stack and execute it
 	FSodaDeleteLayerCommand* pCommand;
 	pCommand = new FSodaDeleteLayerCommand(id);
@@ -440,8 +448,15 @@ bool SodaCanvas::createLayer_Internal(size_t id, Image* source)
 	//set bounds so that we see the layer at the center
 	resizeLayer(*layer);
 
-	if(source)
-		*(layer->getLayerImage()) = source->createCopy();
+	if (source)
+	{
+		//create a copy of the image if the sizes are the same
+		if (source->getWidth() == resolution && source->getHeight() == resolution)
+			*(layer->getLayerImage()) = source->createCopy();
+		//OR if different, we rescale it (which will also create a copy)
+		else
+			*(layer->getLayerImage()) = source->rescaled(resolution, resolution);
+	}
 
 	OnLayerCreated.Call(id);
 

@@ -52,11 +52,20 @@ public:
 
 	/*
 	@ Creates a Layer and sets it as Active.
-	@ it creates a map between the ID specified and the index the layer is at.
+	@ it creates a map between a new ID generated and the index the layer is at.
 	@ it also pushes the layer creation command into the undo stack.
 	@ returns true if the operations were successful or false if the ID already exists in the map
 	*/
-	bool createLayer(size_t id);
+	bool createLayer();
+
+	/*
+	@ Creates a Layer and sets it as Active.
+	@ it creates a map between generated and the index the layer is at.
+	@ it copies the specified image data into the layer.
+	@ it also pushes the layer creation command into the undo stack.
+	@ returns true if the operations were successful or false if the ID already exists in the map
+	*/
+	bool createLayer(const Image& image);
 
 	/*
 	@ Deletes the designated layer. If it was the active layer, the program will look
@@ -135,6 +144,8 @@ public:
 	bool undo();
 	bool redo();
 
+	//counter that only goes up to ensure we are always generating a unique layer
+	long long layer_id = 0;
 
 	/*
 	Internal creation of layer (should only be used by Commands)

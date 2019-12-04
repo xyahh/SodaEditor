@@ -143,6 +143,12 @@ void SodaRibbon::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == openButton.get())
     {
         //[UserButtonCode_openButton] -- add your button handler code here..
+		auto* fc = new FilenameComponent("fileComp",
+			{},
+			false, false, false, "*.png", {}, "Select image to open");
+			fc->addListener(this);
+			fc->setSize(80, 80);
+			CallOutBox::launchAsynchronously(fc, openButton->getScreenBounds(), nullptr);
         //[/UserButtonCode_openButton]
     }
     else if (buttonThatWasClicked == undoButton.get())
@@ -184,6 +190,15 @@ void SodaRibbon::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void SodaRibbon::filenameComponentChanged(FilenameComponent * fileComponentThatHasChanged)
+{
+	Image image = ImageFileFormat::loadFrom(fileComponentThatHasChanged->getCurrentFile());
+	if (image.isValid())
+		canvas->createLayer(image);
+
+}
+
 //[/MiscUserCode]
 
 
@@ -197,9 +212,10 @@ void SodaRibbon::sliderValueChanged (Slider* sliderThatWasMoved)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SodaRibbon" componentName=""
-                 parentClasses="public Component" constructorParams="SodaCanvas* canvas_"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
+                 parentClasses="public Component, public FilenameComponentListener"
+                 constructorParams="SodaCanvas* canvas_" variableInitialisers=""
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff808080"/>
   <IMAGEBUTTON name="saveButton" id="57b5620acb94066" memberName="saveButton"
                virtualName="" explicitFocusOrder="0" pos="30 0Cc 80 80" posRelativeX="3556f1b5c9482824"
@@ -209,11 +225,11 @@ BEGIN_JUCER_METADATA
                colourNormal="f0f8ff" resourceOver="" opacityOver="1.0" colourOver="88373737"
                resourceDown="" opacityDown="1.0" colourDown="88393939"/>
   <IMAGEBUTTON name="openButton" id="6cc3745e75731351" memberName="openButton"
-               virtualName="" explicitFocusOrder="0" pos="130 0Cc 80 80" posRelativeX="3556f1b5c9482824"
-               posRelativeY="3556f1b5c9482824" posRelativeW="3556f1b5c9482824"
-               buttonText="Open" connectedEdges="0" needsCallback="1" radioGroupId="0"
-               keepProportions="1" resourceNormal="openIcon_png2" opacityNormal="1.0"
-               colourNormal="0" resourceOver="" opacityOver="0.800000011920929"
+               virtualName="ImageButton" explicitFocusOrder="0" pos="130 0Cc 80 80"
+               posRelativeX="3556f1b5c9482824" posRelativeY="3556f1b5c9482824"
+               posRelativeW="3556f1b5c9482824" buttonText="Open" connectedEdges="0"
+               needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="openIcon_png2"
+               opacityNormal="1.0" colourNormal="0" resourceOver="" opacityOver="0.800000011920929"
                colourOver="88343434" resourceDown="" opacityDown="1.0" colourDown="88353535"/>
   <IMAGEBUTTON name="undoButton" id="a6c18f8c268063c" memberName="undoButton"
                virtualName="" explicitFocusOrder="0" pos="230 0Cc 80 80" posRelativeX="3556f1b5c9482824"

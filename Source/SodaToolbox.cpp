@@ -164,7 +164,7 @@ void SodaToolbox::update()
 void SodaToolbox::createLayer()
 {
 	static long long layer_id = 1;
-	if(false == sodaCanvas->createLayer(layer_id++));
+	if(false == sodaCanvas->createLayer());
 }
 
 void SodaToolbox::layerCreated(size_t layer_id)
